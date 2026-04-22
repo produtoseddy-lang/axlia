@@ -1,1 +1,19 @@
 project_id = "nbrugrwckgcoogfuhywu"
+
+[functions.check-fingerprint]
+verify_jwt = false
+
+[functions.register-fingerprint]
+verify_jwt = false
+
+[functions.resolver-tpc]
+verify_jwt = true
+
+[functions.preparar-teste]
+verify_jwt = true
+
+[functions.resolver-matematica]
+verify_jwt = true
+
+[functions.verificar-pagamento]
+verify_jwt = true
