@@ -6,6 +6,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { LogOut, User as UserIcon, LayoutDashboard, Crown, ShieldCheck, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { NotificationBell } from "./NotificationBell";
 
 export const Header = () => {
   const { user, signOut } = useAuth();
@@ -44,6 +45,7 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-2">
+          {user && <NotificationBell />}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
