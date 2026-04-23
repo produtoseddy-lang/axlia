@@ -83,13 +83,15 @@ const Quiz = () => {
       estilo_aprendizagem: answers.estilo_aprendizagem,
       onboarding_completo: true,
     }).eq("id", user.id);
-    setSaving(false);
     if (error) {
+      setSaving(false);
       toast.error("Erro ao guardar perfil");
       return;
     }
-    await refresh();
-    navigate("/dashboard");
+    // Navigate first, then refresh in background. Dashboard's ProtectedRoute
+    // will fetch a fresh profile on mount.
+    navigate("/dashboard", { replace: true });
+    refresh();
   };
 
   const Card = ({ selected, onClick, children }: any) => (
