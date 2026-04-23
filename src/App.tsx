@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import Resolver from "./pages/Resolver.tsx";
 import PrepararTeste from "./pages/PrepararTeste.tsx";
 import Matematica from "./pages/Matematica.tsx";
+import ResumoDefesa from "./pages/ResumoDefesa.tsx";
 import Premium from "./pages/Premium.tsx";
 import Admin from "./pages/Admin.tsx";
 import VerificarEmail from "./pages/VerificarEmail.tsx";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/resolver" element={<ProtectedRoute><Resolver /></ProtectedRoute>} />
             <Route path="/preparar-teste" element={<ProtectedRoute><PrepararTeste /></ProtectedRoute>} />
             <Route path="/matematica" element={<ProtectedRoute><Matematica /></ProtectedRoute>} />
+            <Route path="/resumo-defesa" element={<ProtectedRoute><ResumoDefesa /></ProtectedRoute>} />
             <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
