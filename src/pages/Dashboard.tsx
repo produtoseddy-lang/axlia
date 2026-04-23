@@ -9,7 +9,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MarkdownView } from "@/components/MarkdownView";
-import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, History } from "lucide-react";
+import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, History, HelpCircle } from "lucide-react";
+import { ExplicarMelhorDialog } from "@/components/ExplicarMelhorDialog";
 
 interface Sessao {
   id: string;
@@ -27,6 +28,7 @@ const Dashboard = () => {
   const { profile, isPremium, isAdmin } = useProfile();
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [openSessao, setOpenSessao] = useState<Sessao | null>(null);
+  const [openExplicar, setOpenExplicar] = useState<Sessao | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -148,9 +150,16 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <Button size="sm" variant="ghost" onClick={() => setOpenSessao(s)} className="text-primary shrink-0">
-                        Ver resposta
-                      </Button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button size="sm" variant="ghost" onClick={() => setOpenSessao(s)} className="text-primary">
+                          Ver resposta
+                        </Button>
+                        {s.resposta_ia && (
+                          <Button size="sm" variant="ghost" onClick={() => setOpenExplicar(s)} className="text-foreground hidden sm:inline-flex">
+                            <HelpCircle className="w-3.5 h-3.5 mr-1" /> Pedir explicação
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -175,8 +184,26 @@ const Dashboard = () => {
             <DialogTitle>{openSessao && tipoLabel(openSessao.tipo)}</DialogTitle>
           </DialogHeader>
           {openSessao?.resposta_ia && <MarkdownView content={openSessao.resposta_ia} />}
+          {openSessao?.resposta_ia && (
+            <Button
+              variant="outline"
+              className="mt-3 w-full sm:hidden"
+              onClick={() => {
+                setOpenExplicar(openSessao);
+                setOpenSessao(null);
+              }}
+            >
+              <HelpCircle className="w-4 h-4 mr-2" /> Pedir explicação
+            </Button>
+          )}
         </DialogContent>
       </Dialog>
+
+      <ExplicarMelhorDialog
+        open={!!openExplicar}
+        onOpenChange={(o) => !o && setOpenExplicar(null)}
+        respostaOriginal={openExplicar?.resposta_ia ?? ""}
+      />
     </div>
   );
 };

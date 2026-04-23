@@ -1,4 +1,4 @@
-import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserParts, callLovableAI } from "../_shared/ai.ts";
+import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserParts, callLovableAI, SECURITY_RULES } from "../_shared/ai.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -6,7 +6,7 @@ Deno.serve(async (req) => {
     const { ficha_url, exercicio_url, tema } = await req.json();
     const { profile } = await getUserAndProfile(req);
 
-    const system = `És um professor moçambicano experiente.
+    const system = `${SECURITY_RULES}És um professor moçambicano experiente.
 ${buildProfileContext(profile)}
 
 Com base no material fornecido (ficha + exercícios já feitos) e no tema do teste, gera:

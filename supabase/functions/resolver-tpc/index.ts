@@ -1,4 +1,4 @@
-import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserParts, callLovableAI } from "../_shared/ai.ts";
+import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserParts, callLovableAI, SECURITY_RULES } from "../_shared/ai.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -6,7 +6,7 @@ Deno.serve(async (req) => {
     const { ficha_url, exercicio_url } = await req.json();
     const { profile } = await getUserAndProfile(req);
 
-    const system = `És um assistente de estudos para alunos moçambicanos.
+    const system = `${SECURITY_RULES}És um assistente de estudos para alunos moçambicanos.
 ${buildProfileContext(profile)}
 
 Lê a ficha do professor (se fornecida) e resolve os exercícios do TPC usando EXACTAMENTE o mesmo método e formato da ficha.

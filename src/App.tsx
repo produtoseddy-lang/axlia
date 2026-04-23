@@ -16,6 +16,7 @@ import PrepararTeste from "./pages/PrepararTeste.tsx";
 import Matematica from "./pages/Matematica.tsx";
 import Premium from "./pages/Premium.tsx";
 import Admin from "./pages/Admin.tsx";
+import VerificarEmail from "./pages/VerificarEmail.tsx";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/verificar-email" element={<VerificarEmail />} />
             <Route path="/quiz" element={<ProtectedRoute requireOnboarding={false}><Quiz /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/resolver" element={<ProtectedRoute><Resolver /></ProtectedRoute>} />
