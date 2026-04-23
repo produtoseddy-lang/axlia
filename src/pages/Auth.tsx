@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Check, X } from "lucide-react";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { useAuth } from "@/hooks/useAuth";
+import { evaluatePassword } from "@/lib/passwordStrength";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const Auth = () => {
     if (user) navigate("/dashboard", { replace: true });
   }, [user, navigate]);
 
+  const strength = useMemo(() => evaluatePassword(password), [password]);
+
   const getFingerprint = async () => {
     const fp = await FingerprintJS.load();
     const result = await fp.get();
@@ -37,6 +40,12 @@ const Auth = () => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        sessionStorage.setItem("estudamz_pending_email", email);
+        toast.error("Email ainda não verificado.");
+        navigate("/verificar-email");
+        return;
+      }
       toast.error(error.message);
       return;
     }
@@ -46,14 +55,13 @@ const Auth = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error("Password deve ter pelo menos 6 caracteres");
+    if (!strength.isValid) {
+      toast.error("Password deve ter 8+ caracteres, 1 maiúscula e 1 número.");
       return;
     }
     setLoading(true);
 
     try {
-      // 1) verificar fingerprint via edge function
       const fingerprint = await getFingerprint();
       const { data: fpCheck } = await supabase.functions.invoke("check-fingerprint", {
         body: { fingerprint_id: fingerprint },
@@ -64,31 +72,36 @@ const Auth = () => {
         return;
       }
 
-      // 2) criar conta
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/quiz`,
           data: { nome },
         },
       });
       if (error) throw error;
       if (!data.user) throw new Error("Falha no registo");
 
-      // 3) registar fingerprint
       await supabase.functions.invoke("register-fingerprint", {
         body: { fingerprint_id: fingerprint, user_id: data.user.id },
       });
 
-      toast.success("Conta criada! 🎉");
-      navigate("/quiz");
+      sessionStorage.setItem("estudamz_pending_email", email);
+      toast.success("Conta criada! Verifica o teu email 📧");
+      navigate("/verificar-email");
     } catch (err: any) {
       toast.error(err.message ?? "Erro ao criar conta");
     } finally {
       setLoading(false);
     }
   };
+
+  const Req = ({ ok, label }: { ok: boolean; label: string }) => (
+    <div className={`flex items-center gap-1 text-xs ${ok ? "text-emerald-500" : "text-muted-foreground"}`}>
+      {ok ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />} {label}
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -138,13 +151,54 @@ const Auth = () => {
                   </div>
                   <div>
                     <Label htmlFor="rpass">Password</Label>
-                    <Input id="rpass" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+                    <Input
+                      id="rpass"
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Mínimo 8 caracteres, 1 maiúscula, 1 número"
+                    />
+
+                    {/* Força da password */}
+                    <div className="mt-2 space-y-2">
+                      <div className="flex gap-1">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className={`h-1.5 flex-1 rounded-full transition-colors ${
+                              strength.score >= i ? strength.color : "bg-muted"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      {password.length > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Força:</span>
+                          <span className={`text-xs font-medium ${
+                            strength.score === 3 ? "text-emerald-500" :
+                            strength.score === 2 ? "text-warning" : "text-destructive"
+                          }`}>
+                            {strength.label}
+                          </span>
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        <Req ok={strength.hasMin} label="Mínimo 8 caracteres" />
+                        <Req ok={strength.hasUpper} label="1 letra maiúscula" />
+                        <Req ok={strength.hasNumber} label="1 número" />
+                      </div>
+                    </div>
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
+                  <Button
+                    type="submit"
+                    disabled={loading || !strength.isValid}
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary-glow"
+                  >
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Criar Conta Grátis"}
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
-                    Ao criar conta aceitas os termos do EstudaMZ.
+                    Vais receber um email para confirmar a tua conta.
                   </p>
                 </form>
               </TabsContent>

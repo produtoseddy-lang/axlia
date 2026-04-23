@@ -89,6 +89,13 @@ Responde APENAS em JSON válido sem texto adicional, neste formato exacto:
         plano: "premium",
         premium_ate: ate.toISOString().slice(0, 10),
       }).eq("id", user.id);
+
+      await supabaseAdmin.from("notificacoes").insert({
+        user_id: user.id,
+        titulo: "✅ Premium activado!",
+        mensagem: "O teu pagamento foi aprovado. Aproveita 30 dias de acesso completo.",
+        tipo: "premium",
+      });
     }
 
     return new Response(JSON.stringify(parsed), {
