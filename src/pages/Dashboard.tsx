@@ -184,8 +184,26 @@ const Dashboard = () => {
             <DialogTitle>{openSessao && tipoLabel(openSessao.tipo)}</DialogTitle>
           </DialogHeader>
           {openSessao?.resposta_ia && <MarkdownView content={openSessao.resposta_ia} />}
+          {openSessao?.resposta_ia && (
+            <Button
+              variant="outline"
+              className="mt-3 w-full sm:hidden"
+              onClick={() => {
+                setOpenExplicar(openSessao);
+                setOpenSessao(null);
+              }}
+            >
+              <HelpCircle className="w-4 h-4 mr-2" /> Pedir explicação
+            </Button>
+          )}
         </DialogContent>
       </Dialog>
+
+      <ExplicarMelhorDialog
+        open={!!openExplicar}
+        onOpenChange={(o) => !o && setOpenExplicar(null)}
+        respostaOriginal={openExplicar?.resposta_ia ?? ""}
+      />
     </div>
   );
 };
