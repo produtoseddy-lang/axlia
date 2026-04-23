@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MarkdownView } from "@/components/MarkdownView";
-import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, History, HelpCircle } from "lucide-react";
+import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, History, HelpCircle, GraduationCap } from "lucide-react";
 import { ExplicarMelhorDialog } from "@/components/ExplicarMelhorDialog";
 
 interface Sessao {
@@ -19,8 +19,8 @@ interface Sessao {
   criado_em: string;
 }
 
-const tipoIcone = (t: string) => t === "tpc" ? Zap : t === "teste" ? BookOpen : Calculator;
-const tipoLabel = (t: string) => t === "tpc" ? "Resolver TPC" : t === "teste" ? "Preparação para Teste" : "Matemática";
+const tipoIcone = (t: string) => t === "tpc" ? Zap : t === "teste" ? BookOpen : t === "defesa" ? GraduationCap : Calculator;
+const tipoLabel = (t: string) => t === "tpc" ? "Resolver TPC" : t === "teste" ? "Preparação para Teste" : t === "defesa" ? "Resumo para Defesa" : "Matemática";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -52,6 +52,7 @@ const Dashboard = () => {
     { id: "tpc", icon: Zap, title: "Resolver TPC", desc: "Carrega o exercício e recebe a solução completa", route: "/resolver", premium: false },
     { id: "teste", icon: BookOpen, title: "Preparação para Teste", desc: "Resumos, simulações e respostas modelo", route: "/preparar-teste", premium: true },
     { id: "mat", icon: Calculator, title: "Matemática Passo a Passo", desc: "Resolve com fórmulas explicadas", route: "/matematica", premium: true },
+    { id: "defesa", icon: GraduationCap, title: "Resumos para Defesa 🎓", desc: "Prepara a tua defesa com perguntas do júri e resumo", route: "/resumo-defesa", premium: true },
   ];
 
   return (
