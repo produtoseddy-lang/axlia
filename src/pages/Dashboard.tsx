@@ -49,10 +49,10 @@ const Dashboard = () => {
   const dias = diasRestantesPremium();
 
   const tools = [
-    { id: "tpc", icon: Zap, title: "Resolver TPC", desc: "Carrega o exercício e recebe a solução completa", route: "/resolver", premium: false },
-    { id: "teste", icon: BookOpen, title: "Preparação para Teste", desc: "Resumos, simulações e respostas modelo", route: "/preparar-teste", premium: true },
-    { id: "mat", icon: Calculator, title: "Matemática Passo a Passo", desc: "Resolve com fórmulas explicadas", route: "/matematica", premium: true },
-    { id: "defesa", icon: GraduationCap, title: "Resumos para Defesa 🎓", desc: "Prepara a tua defesa com perguntas do júri e resumo", route: "/resumo-defesa", premium: true },
+    { id: "tpc", icon: Zap, emoji: "🤖", title: "Resolver TPC", desc: "Resolve exercícios no estilo do teu professor", route: "/resolver", premium: false },
+    { id: "teste", icon: BookOpen, emoji: "📚", title: "Preparação para Teste", desc: "Gera perguntas simuladas do teste", route: "/preparar-teste", premium: true },
+    { id: "mat", icon: Calculator, emoji: "📐", title: "Matemática Passo a Passo", desc: "Resolve com o método do professor", route: "/matematica", premium: true },
+    { id: "defesa", icon: GraduationCap, emoji: "🎓", title: "Resumos para Defesa", desc: "Prepara perguntas do júri", route: "/resumo-defesa", premium: true },
   ];
 
   return (
@@ -98,27 +98,39 @@ const Dashboard = () => {
           )}
 
           {/* Ferramentas */}
-          <div className="grid md:grid-cols-3 gap-4 mb-10">
+          <div className="grid md:grid-cols-2 gap-4 mb-10">
             {tools.map((t) => {
               const blocked = t.premium && !isPremium;
               return (
                 <button
                   key={t.id}
                   onClick={() => blocked ? navigate("/premium") : navigate(t.route)}
-                  className="text-left bg-card border border-border rounded-2xl p-5 hover:border-primary/40 transition relative card-glow"
+                  className="text-left bg-card border border-border rounded-2xl p-5 hover:border-primary/40 transition relative card-glow overflow-hidden"
                 >
-                  {blocked && (
-                    <div className="absolute top-3 right-3 p-1.5 bg-primary/10 rounded-full">
-                      <Lock className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                  )}
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3">
-                    <t.icon className="w-5 h-5 text-primary" />
+                  {/* Badge top-right */}
+                  <span
+                    className={`absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full font-bold tracking-wide ${
+                      t.premium
+                        ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-black"
+                        : "bg-primary/15 text-primary border border-primary/30"
+                    }`}
+                  >
+                    {t.premium ? "PREMIUM" : "GRÁTIS"}
+                  </span>
+
+                  <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3 text-2xl">
+                    <span aria-hidden>{t.emoji}</span>
                   </div>
-                  <h3 className="font-semibold mb-1">{t.title}</h3>
+                  <h3 className="font-semibold mb-1 pr-16">{t.title}</h3>
                   <p className="text-xs text-muted-foreground">{t.desc}</p>
-                  {t.premium && (
-                    <span className="inline-block mt-2 text-[10px] px-2 py-0.5 bg-primary/10 text-primary rounded-full font-medium">PREMIUM</span>
+
+                  {/* Locked overlay */}
+                  {blocked && (
+                    <div className="absolute inset-0 bg-background/75 backdrop-blur-[2px] flex items-center justify-center rounded-2xl">
+                      <div className="w-12 h-12 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-primary" />
+                      </div>
+                    </div>
                   )}
                 </button>
               );

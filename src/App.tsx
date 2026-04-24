@@ -18,6 +18,7 @@ import ResumoDefesa from "./pages/ResumoDefesa.tsx";
 import Premium from "./pages/Premium.tsx";
 import Admin from "./pages/Admin.tsx";
 import VerificarEmail from "./pages/VerificarEmail.tsx";
+import Perfil from "./pages/Perfil.tsx";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/resumo-defesa" element={<ProtectedRoute><ResumoDefesa /></ProtectedRoute>} />
             <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
