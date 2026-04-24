@@ -7,10 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MarkdownView } from "@/components/MarkdownView";
-import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, History, HelpCircle, GraduationCap } from "lucide-react";
-import { ExplicarMelhorDialog } from "@/components/ExplicarMelhorDialog";
+import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, Clock, GraduationCap, ChevronRight } from "lucide-react";
 
 interface Sessao {
   id: string;
@@ -19,16 +16,11 @@ interface Sessao {
   criado_em: string;
 }
 
-const tipoIcone = (t: string) => t === "tpc" ? Zap : t === "teste" ? BookOpen : t === "defesa" ? GraduationCap : Calculator;
-const tipoLabel = (t: string) => t === "tpc" ? "Resolver TPC" : t === "teste" ? "Preparação para Teste" : t === "defesa" ? "Resumo para Defesa" : "Matemática";
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, isPremium, isAdmin } = useProfile();
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
-  const [openSessao, setOpenSessao] = useState<Sessao | null>(null);
-  const [openExplicar, setOpenExplicar] = useState<Sessao | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -37,7 +29,6 @@ const Dashboard = () => {
       .select("*")
       .eq("user_id", user.id)
       .order("criado_em", { ascending: false })
-      .limit(10)
       .then(({ data }) => setSessoes(data ?? []));
   }, [user]);
 
@@ -137,48 +128,24 @@ const Dashboard = () => {
             })}
           </div>
 
-          {/* Histórico */}
-          <div>
-            <h2 className="text-xl font-semibold mb-3 flex items-center gap-2">
-              <History className="w-5 h-5 text-primary" /> Histórico de Sessões
-            </h2>
-            {sessoes.length === 0 ? (
-              <div className="bg-card border border-dashed border-border rounded-xl p-8 text-center text-muted-foreground text-sm">
-                Ainda não tens sessões. Começa por resolver um TPC!
+          {/* Histórico card */}
+          <button
+            onClick={() => navigate("/historico")}
+            className="w-full text-left bg-card border border-border rounded-2xl p-5 hover:border-primary/40 transition card-glow flex items-center justify-between gap-3"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-2xl shrink-0">
+                <span aria-hidden>🕐</span>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {sessoes.map((s) => {
-                  const Icon = tipoIcone(s.tipo);
-                  return (
-                    <div key={s.id} className="bg-card border border-border rounded-xl p-3 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <Icon className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-medium text-sm truncate">{tipoLabel(s.tipo)}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {new Date(s.criado_em).toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button size="sm" variant="ghost" onClick={() => setOpenSessao(s)} className="text-primary">
-                          Ver resposta
-                        </Button>
-                        {s.resposta_ia && (
-                          <Button size="sm" variant="ghost" onClick={() => setOpenExplicar(s)} className="text-foreground hidden sm:inline-flex">
-                            <HelpCircle className="w-3.5 h-3.5 mr-1" /> Pedir explicação
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div className="min-w-0">
+                <h3 className="font-semibold">Ver Histórico</h3>
+                <p className="text-xs text-muted-foreground">
+                  {sessoes.length} {sessoes.length === 1 ? "sessão guardada" : "sessões guardadas"}
+                </p>
               </div>
-            )}
-          </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+          </button>
 
           {!isPremium && (
             <div className="mt-10 p-5 bg-warning/10 border border-warning/30 rounded-xl text-center">
@@ -190,33 +157,6 @@ const Dashboard = () => {
           )}
         </div>
       </main>
-
-      <Dialog open={!!openSessao} onOpenChange={(o) => !o && setOpenSessao(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{openSessao && tipoLabel(openSessao.tipo)}</DialogTitle>
-          </DialogHeader>
-          {openSessao?.resposta_ia && <MarkdownView content={openSessao.resposta_ia} />}
-          {openSessao?.resposta_ia && (
-            <Button
-              variant="outline"
-              className="mt-3 w-full sm:hidden"
-              onClick={() => {
-                setOpenExplicar(openSessao);
-                setOpenSessao(null);
-              }}
-            >
-              <HelpCircle className="w-4 h-4 mr-2" /> Pedir explicação
-            </Button>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <ExplicarMelhorDialog
-        open={!!openExplicar}
-        onOpenChange={(o) => !o && setOpenExplicar(null)}
-        respostaOriginal={openExplicar?.resposta_ia ?? ""}
-      />
     </div>
   );
 };
