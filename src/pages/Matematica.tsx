@@ -14,6 +14,8 @@ import { Loader2, Sparkles, Copy, Calculator, ArrowLeft } from "lucide-react";
 const ACCEPT = {
   "image/*": [".png", ".jpg", ".jpeg", ".webp"],
   "application/pdf": [".pdf"],
+  "application/msword": [".doc"],
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
 };
 
 const Matematica = () => {
