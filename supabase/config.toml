@@ -7,13 +7,19 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.resolver-tpc]
-verify_jwt = true
+verify_jwt = false
 
 [functions.preparar-teste]
-verify_jwt = true
+verify_jwt = false
 
 [functions.resolver-matematica]
-verify_jwt = true
+verify_jwt = false
 
 [functions.verificar-pagamento]
-verify_jwt = true
+verify_jwt = false
+
+[functions.explicar-melhor]
+verify_jwt = false
+
+[functions.resumo-defesa]
+verify_jwt = false
