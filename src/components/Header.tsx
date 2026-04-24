@@ -61,6 +61,9 @@ export const Header = () => {
                 <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                   <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/perfil")}>
+                  <UserIcon className="w-4 h-4 mr-2" /> Perfil
+                </DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
                     <ShieldCheck className="w-4 h-4 mr-2" /> Admin
