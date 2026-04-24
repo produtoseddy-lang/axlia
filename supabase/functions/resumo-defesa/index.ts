@@ -1,11 +1,11 @@
-import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserParts, callLovableAI, SECURITY_RULES } from "../_shared/ai.ts";
+import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabelled, callLovableAI, SECURITY_RULES } from "../_shared/ai.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const { material_url, tema, tipo_defesa } = await req.json();
     if (!material_url || !tema) {
-      return new Response(JSON.stringify({ error: "Material e tema são obrigatórios" }), {
+      return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: material ou tema em falta" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -34,9 +34,16 @@ Como se comportar, o que enfatizar, o que evitar. Lista clara de boas práticas.
 
 Responde sempre em Português de Moçambique. Adapta a profundidade ao nível do aluno.`;
 
-    const userParts = await buildUserParts(
-      `Tema do trabalho: ${tema}\nTipo de defesa: ${tipo_defesa || "não especificado"}\n\nUsa o material em anexo para preparar a defesa.`,
-      [material_url],
+    const userParts = await buildUserPartsLabelled(
+      `Este é o material do trabalho do aluno:
+[material em anexo abaixo]
+
+Tema: ${tema} — Tipo: ${tipo_defesa || "não especificado"}
+
+Cria resumo executivo, pontos-chave, perguntas do júri e dicas para a defesa.`,
+      [
+        { label: "Material do trabalho", url: material_url, required: true },
+      ],
     );
 
     const resposta = await callLovableAI(userParts, system);
@@ -45,7 +52,7 @@ Responde sempre em Português de Moçambique. Adapta a profundidade ao nível do
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error(e);
+    console.error("resumo-defesa error:", e);
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

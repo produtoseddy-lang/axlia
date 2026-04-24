@@ -1,4 +1,4 @@
-import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserParts, callLovableAI, SECURITY_RULES } from "../_shared/ai.ts";
+import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabelled, callLovableAI, SECURITY_RULES } from "../_shared/ai.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -17,9 +17,20 @@ Com base no material fornecido (ficha + exercícios já feitos) e no tema do tes
 
 Usa Markdown bem formatado, com títulos, listas numeradas e exemplos.`;
 
-    const userParts = await buildUserParts(
-      `Tema do teste: ${tema || "não especificado"}\n\nUsa o material para preparar o aluno.`,
-      [ficha_url, exercicio_url],
+    const userParts = await buildUserPartsLabelled(
+      `Tema do teste: ${tema || "não especificado"}
+
+Esta é a ficha do professor:
+[ficha em anexo abaixo, se fornecida]
+
+Estes são os exercícios já feitos pelo aluno:
+[exercícios em anexo abaixo, se fornecidos]
+
+Com base neste material cria: resumo, perguntas simuladas e respostas passo a passo.`,
+      [
+        { label: "Ficha do professor", url: ficha_url, required: false },
+        { label: "Exercícios já feitos pelo aluno", url: exercicio_url, required: false },
+      ],
     );
 
     const resposta = await callLovableAI(userParts, system);
@@ -28,7 +39,7 @@ Usa Markdown bem formatado, com títulos, listas numeradas e exemplos.`;
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error(e);
+    console.error("preparar-teste error:", e);
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

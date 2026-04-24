@@ -48,17 +48,45 @@ ${estiloHint}
 Adapta a complexidade ao nível do aluno e responde sempre em Português de Moçambique.`;
 };
 
+// Detect mime type from URL extension as fallback
+const mimeFromUrl = (url: string): string => {
+  const lower = url.toLowerCase().split("?")[0];
+  if (lower.endsWith(".png")) return "image/png";
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".webp")) return "image/webp";
+  if (lower.endsWith(".gif")) return "image/gif";
+  if (lower.endsWith(".pdf")) return "application/pdf";
+  if (lower.endsWith(".doc")) return "application/msword";
+  if (lower.endsWith(".docx")) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  return "application/octet-stream";
+};
+
+const cleanBase64 = (s: string): string => {
+  if (!s) return "";
+  let cleaned = s.trim();
+  if (cleaned.startsWith("data:") && cleaned.includes(",")) cleaned = cleaned.split(",")[1];
+  cleaned = cleaned.replace(/\s/g, "");
+  return cleaned;
+};
+
 export const fetchUrlAsBase64 = async (url: string): Promise<{ data: string; mime: string } | null> => {
   if (!url) return null;
   const res = await fetch(url);
-  if (!res.ok) return null;
-  const mime = res.headers.get("content-type") ?? "application/octet-stream";
+  if (!res.ok) {
+    console.error(`Falha ao baixar ficheiro ${url}: ${res.status}`);
+    return null;
+  }
+  let mime = res.headers.get("content-type") ?? "";
+  if (!mime || mime === "application/octet-stream") mime = mimeFromUrl(url);
   const buf = await res.arrayBuffer();
-  // base64 encode
   let binary = "";
   const bytes = new Uint8Array(buf);
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-  return { data: btoa(binary), mime };
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunk)));
+  }
+  const data = cleanBase64(btoa(binary));
+  return { data, mime };
 };
 
 export const callLovableAI = async (userParts: any[], systemPrompt: string, model = "google/gemini-2.5-flash") => {
@@ -91,21 +119,55 @@ export const callLovableAI = async (userParts: any[], systemPrompt: string, mode
   return data.choices?.[0]?.message?.content ?? "";
 };
 
-export const buildUserParts = async (text: string, urls: (string | null | undefined)[]) => {
-  const parts: any[] = [{ type: "text", text }];
-  for (const url of urls) {
-    if (!url) continue;
-    const file = await fetchUrlAsBase64(url);
-    if (!file) continue;
+/**
+ * Build user message parts with labelled file slots.
+ * Each slot = { label, url, required }.
+ * Throws if a required file is missing or could not be fetched.
+ */
+export const buildUserPartsLabelled = async (
+  intro: string,
+  slots: { label: string; url?: string | null; required?: boolean }[],
+) => {
+  const parts: any[] = [{ type: "text", text: intro }];
+
+  for (const slot of slots) {
+    if (!slot.url) {
+      if (slot.required) throw new Error(`Ficheiro não recebido correctamente: ${slot.label}`);
+      continue;
+    }
+
+    const file = await fetchUrlAsBase64(slot.url);
+    if (!file || !file.data) {
+      if (slot.required) throw new Error(`Ficheiro não recebido correctamente: ${slot.label}`);
+      continue;
+    }
+
+    console.log(`[${slot.label}] mime=${file.mime} base64_size=${file.data.length}`);
+
+    // Label the file in the conversation
+    parts.push({ type: "text", text: `\n--- ${slot.label} ---` });
+
     if (file.mime.startsWith("image/")) {
       parts.push({
         type: "image_url",
         image_url: { url: `data:${file.mime};base64,${file.data}` },
       });
     } else {
-      // For non-image (pdf/doc), we add as text reference URL
-      parts.push({ type: "text", text: `[Ficheiro anexo: ${url}]` });
+      // PDFs and docs: send as image_url data URI too — gateway forwards to Gemini which accepts inline file data.
+      parts.push({
+        type: "image_url",
+        image_url: { url: `data:${file.mime};base64,${file.data}` },
+      });
     }
   }
+
   return parts;
+};
+
+// Backwards compatible wrapper (kept in case other code uses it)
+export const buildUserParts = async (text: string, urls: (string | null | undefined)[]) => {
+  return buildUserPartsLabelled(
+    text,
+    urls.map((u, i) => ({ label: `Ficheiro ${i + 1}`, url: u ?? undefined })),
+  );
 };
