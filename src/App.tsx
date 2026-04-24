@@ -19,6 +19,7 @@ import Premium from "./pages/Premium.tsx";
 import Admin from "./pages/Admin.tsx";
 import VerificarEmail from "./pages/VerificarEmail.tsx";
 import Perfil from "./pages/Perfil.tsx";
+import Historico from "./pages/Historico.tsx";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+            <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

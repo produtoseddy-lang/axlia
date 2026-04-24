@@ -99,6 +99,7 @@ export const Header = () => {
               <>
                 <Link to="/dashboard" onClick={() => setOpen(false)} className="text-sm py-1">Dashboard</Link>
                 <Link to="/resolver" onClick={() => setOpen(false)} className="text-sm py-1">Resolver TPC</Link>
+                <Link to="/historico" onClick={() => setOpen(false)} className="text-sm py-1">Histórico</Link>
                 <Link to="/premium" onClick={() => setOpen(false)} className="text-sm py-1 text-primary">Premium</Link>
               </>
             ) : (
