@@ -7,7 +7,7 @@ export const Logo = ({ to = "/" }: { to?: string }) => (
       <Sparkles className="w-5 h-5 text-primary-foreground" />
     </div>
     <span className="text-xl font-bold tracking-tight">
-      Estuda<span className="text-primary">MZ</span>
+      AXL <span className="text-primary">IA</span>
     </span>
   </Link>
 );

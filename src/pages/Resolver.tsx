@@ -116,7 +116,7 @@ const Resolver = () => {
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center shrink-0">
                     <Sparkles className="w-4 h-4 text-primary-foreground" />
                   </div>
-                  <div className="font-semibold text-primary pt-1">EstudaMZ IA</div>
+                  <div className="font-semibold text-primary pt-1">AXL IA</div>
                 </div>
                 <MarkdownView content={resposta} />
               </div>

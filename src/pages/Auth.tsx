@@ -112,7 +112,7 @@ const Auth = () => {
             <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-glow items-center justify-center mb-4 glow-cyan">
               <Sparkles className="w-7 h-7 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold">Bem-vindo ao EstudaMZ</h1>
+            <h1 className="text-2xl font-bold">Bem-vindo ao AXL IA</h1>
             <p className="text-muted-foreground text-sm mt-1">A IA que estuda como o teu professor</p>
           </div>
 

@@ -147,7 +147,7 @@ const Index = () => {
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span>EstudaMZ © {new Date().getFullYear()} — Feito com ❤️ em Moçambique</span>
+            <span>AXL IA © {new Date().getFullYear()} — Feito com ❤️ em Moçambique</span>
           </div>
           <div className="flex gap-4">
             <Link to="/auth" className="hover:text-primary">Entrar</Link>
