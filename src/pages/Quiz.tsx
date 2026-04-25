@@ -151,7 +151,7 @@ const Quiz = () => {
 
             {step === 1 && (
               <div>
-                <h2 className="text-2xl font-bold mb-6">O que queres fazer com o EstudaMZ?</h2>
+                <h2 className="text-2xl font-bold mb-6">O que queres fazer com o AXL IA?</h2>
                 <div className="space-y-3">
                   {OBJECTIVOS.map((o) => (
                     <Card key={o.id} selected={answers.objectivo_estudo === o.id} onClick={() => setAnswers({ ...answers, objectivo_estudo: o.id })}>

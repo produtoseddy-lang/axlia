@@ -55,7 +55,7 @@ const Premium = () => {
           <div className="max-w-md text-center bg-card border border-primary/30 rounded-2xl p-8 card-glow">
             <Crown className="w-12 h-12 text-primary mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">Já és Premium! 🎉</h1>
-            <p className="text-muted-foreground mb-6">Aproveita todos os recursos do EstudaMZ sem limites.</p>
+            <p className="text-muted-foreground mb-6">Aproveita todos os recursos do AXL IA sem limites.</p>
             <Button onClick={() => navigate("/dashboard")} className="bg-primary text-primary-foreground">Ir ao Dashboard</Button>
           </div>
         </main>
