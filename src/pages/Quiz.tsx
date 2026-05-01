@@ -8,7 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowRight, Bot, Loader2, Search } from "lucide-react";
+import { ArrowRight, Loader2, Search } from "lucide-react";
+import axlLogo from "@/assets/axl-logo.png";
 
 type Answers = {
   objectivo_estudo?: string;
@@ -137,9 +138,7 @@ const Quiz = () => {
           <div key={step} className="animate-slide-in">
             {step === 0 && (
               <div className="text-center py-10">
-                <div className="inline-flex w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary-glow items-center justify-center mb-6 animate-pulse-glow">
-                  <Bot className="w-12 h-12 text-primary-foreground" />
-                </div>
+                <img src={axlLogo} alt="AXL IA" className="inline-block w-24 h-24 rounded-3xl mb-6 animate-pulse-glow object-cover" />
                 <h1 className="text-3xl md:text-4xl font-bold mb-3">Vamos Personalizar a Tua Experiência</h1>
                 <p className="text-muted-foreground mb-8">Responde algumas perguntas para receberes ajuda adaptada ao teu estilo.</p>
                 <Button size="lg" onClick={next} className="bg-primary text-primary-foreground hover:bg-primary-glow glow-cyan h-12 px-8">
