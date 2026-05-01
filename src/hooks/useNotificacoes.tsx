@@ -29,17 +29,21 @@ export const useNotificacoes = () => {
     setItems(data ?? []);
   }, [user]);
 
-  // Auto-create notifications based on profile state (deduped by checking last 24h)
+  // Auto-create notifications based on profile state.
+  // Anti-duplicação: não cria se já existir uma NÃO LIDA do mesmo tipo criada hoje.
   useEffect(() => {
     if (!user || !profile) return;
     (async () => {
-      const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
-      const { data: recent } = await supabase
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const { data: hojeNaoLidas } = await supabase
         .from("notificacoes")
-        .select("titulo")
+        .select("tipo")
         .eq("user_id", user.id)
-        .gte("criado_em", since);
-      const recentTitles = new Set((recent ?? []).map((n) => n.titulo));
+        .eq("lida", false)
+        .gte("criado_em", startOfDay.toISOString());
+      const tiposExistentes = new Set((hojeNaoLidas ?? []).map((n) => n.tipo));
       const toInsert: any[] = [];
 
       // Premium expira em 3 dias
@@ -47,30 +51,24 @@ export const useNotificacoes = () => {
         const dias = Math.ceil(
           (new Date(profile.premium_ate).getTime() - Date.now()) / 86400000,
         );
-        if (dias > 0 && dias <= 3) {
-          const t = "⚠️ Premium expira em breve";
-          if (!recentTitles.has(t)) {
-            toInsert.push({
-              user_id: user.id,
-              titulo: t,
-              mensagem: `O teu Premium expira em ${dias} dia${dias > 1 ? "s" : ""}. Renova para não perder acesso.`,
-              tipo: "premium",
-            });
-          }
+        if (dias > 0 && dias <= 3 && !tiposExistentes.has("premium")) {
+          toInsert.push({
+            user_id: user.id,
+            titulo: "⚠️ Premium expira em breve",
+            mensagem: `O teu Premium expira em ${dias} dia${dias > 1 ? "s" : ""}. Renova para não perder acesso.`,
+            tipo: "premium",
+          });
         }
       }
 
       // Último crédito do dia
-      if (!isPremium && profile.creditos_hoje === 1) {
-        const t = "⏳ Último crédito do dia";
-        if (!recentTitles.has(t)) {
-          toInsert.push({
-            user_id: user.id,
-            titulo: t,
-            mensagem: "Tens apenas 1 crédito grátis restante hoje. Faz upgrade para Premium para uso ilimitado.",
-            tipo: "creditos",
-          });
-        }
+      if (!isPremium && profile.creditos_hoje === 1 && !tiposExistentes.has("creditos")) {
+        toInsert.push({
+          user_id: user.id,
+          titulo: "⏳ Último crédito do dia",
+          mensagem: "Tens apenas 1 crédito grátis restante hoje. Faz upgrade para Premium para uso ilimitado.",
+          tipo: "creditos",
+        });
       }
 
       if (toInsert.length > 0) {
