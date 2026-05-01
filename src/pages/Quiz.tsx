@@ -89,10 +89,8 @@ const Quiz = () => {
       toast.error("Erro ao guardar perfil");
       return;
     }
-    // Navigate first, then refresh in background. Dashboard's ProtectedRoute
-    // will fetch a fresh profile on mount.
-    navigate("/dashboard", { replace: true });
-    refresh();
+    // Force full page reload to /dashboard to avoid blank screen after quiz
+    window.location.href = "/dashboard";
   };
 
   const Card = ({ selected, onClick, children }: any) => (
