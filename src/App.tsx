@@ -18,6 +18,7 @@ import ResumoDefesa from "./pages/ResumoDefesa.tsx";
 import Premium from "./pages/Premium.tsx";
 import Admin from "./pages/Admin.tsx";
 import VerificarEmail from "./pages/VerificarEmail.tsx";
+import VerificarCodigo from "./pages/VerificarCodigo.tsx";
 import Perfil from "./pages/Perfil.tsx";
 import Historico from "./pages/Historico.tsx";
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/verificar-email" element={<VerificarEmail />} />
+            <Route path="/verificar-codigo" element={<VerificarCodigo />} />
             <Route path="/quiz" element={<ProtectedRoute requireOnboarding={false}><Quiz /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/resolver" element={<ProtectedRoute><Resolver /></ProtectedRoute>} />

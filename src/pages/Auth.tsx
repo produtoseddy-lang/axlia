@@ -38,20 +38,33 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setLoading(false);
       if (error.message.toLowerCase().includes("email not confirmed")) {
         sessionStorage.setItem("estudamz_pending_email", email);
         toast.error("Email ainda não verificado.");
-        navigate("/verificar-email");
+        navigate("/verificar-codigo");
         return;
       }
       toast.error(error.message);
       return;
     }
+
+    // Verifica perfil para decidir destino
+    const userId = data.user?.id;
+    let onboardingCompleto = false;
+    if (userId) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("onboarding_completo")
+        .eq("id", userId)
+        .maybeSingle();
+      onboardingCompleto = !!prof?.onboarding_completo;
+    }
+    setLoading(false);
     toast.success("Bem-vindo de volta!");
-    navigate("/dashboard");
+    window.location.href = onboardingCompleto ? "/dashboard" : "/quiz";
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -77,7 +90,7 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/quiz`,
+          // Sem emailRedirectTo → o template de email envia o {{ .Token }} (código OTP)
           data: { nome },
         },
       });
@@ -89,8 +102,8 @@ const Auth = () => {
       });
 
       sessionStorage.setItem("estudamz_pending_email", email);
-      toast.success("Conta criada! Verifica o teu email 📧");
-      navigate("/verificar-email");
+      toast.success("Conta criada! Insere o código de 6 dígitos enviado por email 📧");
+      navigate("/verificar-codigo");
     } catch (err: any) {
       toast.error(err.message ?? "Erro ao criar conta");
     } finally {
