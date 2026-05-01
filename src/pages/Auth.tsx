@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Check, X } from "lucide-react";
+import { Loader2, Check, X } from "lucide-react";
+import axlLogo from "@/assets/axl-logo.png";
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { useAuth } from "@/hooks/useAuth";
 import { evaluatePassword } from "@/lib/passwordStrength";
@@ -109,9 +110,7 @@ const Auth = () => {
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-glow items-center justify-center mb-4 glow-cyan">
-              <Sparkles className="w-7 h-7 text-primary-foreground" />
-            </div>
+            <img src={axlLogo} alt="AXL IA" className="inline-block w-16 h-16 rounded-2xl mb-4 glow-cyan object-cover" />
             <h1 className="text-2xl font-bold">Bem-vindo ao AXL IA</h1>
             <p className="text-muted-foreground text-sm mt-1">A IA que estuda como o teu professor</p>
           </div>
