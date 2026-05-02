@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, BookOpen, ArrowLeft } from "lucide-react";
+import { InstrucoesIA } from "@/components/InstrucoesIA";
 import { Navigate } from "react-router-dom";
 
 const PrepararTeste = () => {
@@ -21,6 +22,7 @@ const PrepararTeste = () => {
   const [ficha, setFicha] = useState<File | null>(null);
   const [exercicios, setExercicios] = useState<File | null>(null);
   const [tema, setTema] = useState("");
+  const [instrucoes, setInstrucoes] = useState("");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
 
@@ -33,7 +35,7 @@ const PrepararTeste = () => {
       const exUrl = await uploadFile(exercicios, user.id);
       const fichaUrl = ficha ? await uploadFile(ficha, user.id) : null;
       const { data, error } = await supabase.functions.invoke("preparar-teste", {
-        body: { ficha_url: fichaUrl, exercicio_url: exUrl, tema },
+        body: { ficha_url: fichaUrl, exercicio_url: exUrl, tema, instrucoes },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -73,6 +75,11 @@ const PrepararTeste = () => {
                 <Label htmlFor="tema">Tema do teste</Label>
                 <Input id="tema" value={tema} onChange={(e) => setTema(e.target.value)} placeholder="Ex: Equações de 2º grau" />
               </div>
+              <InstrucoesIA
+                value={instrucoes}
+                onChange={setInstrucoes}
+                placeholder="Ex: Foca nos tópicos de termodinâmica, cria perguntas de desenvolvimento, não de escolha múltipla..."
+              />
               <Button onClick={handleSubmit} disabled={!exercicios || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A preparar...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar Preparação</>}
               </Button>
