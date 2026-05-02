@@ -4,43 +4,43 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const { material_url, tema, tipo_defesa } = await req.json();
-    if (!material_url || !tema) {
-      return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: material ou tema em falta" }), {
+    if (!material_url) {
+      return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: material do trabalho" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (!tema || !tema.trim()) {
+      return new Response(JSON.stringify({ error: "Tema do trabalho em falta" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { profile } = await getUserAndProfile(req);
 
     const system = `${SECURITY_RULES}És um professor universitário moçambicano especialista em orientação académica.
 ${buildProfileContext(profile)}
 
-O aluno vai defender o trabalho: ${tema}
+O aluno vai defender: ${tema}
 Tipo de defesa: ${tipo_defesa || "não especificado"}
 
-Com base no material enviado, cria uma resposta em Markdown bem formatado com EXACTAMENTE estas 4 secções:
+Com base no material enviado cria:
 
-## 📋 RESUMO EXECUTIVO
-Síntese clara do trabalho completo (máximo 1 página).
+1. RESUMO EXECUTIVO (máximo 1 página)
+2. 5 PONTOS-CHAVE para apresentar
+3. 10 PERGUNTAS PROVÁVEIS DO JÚRI com respostas
+4. DICAS PARA A DEFESA
 
-## 🎯 PONTOS-CHAVE PARA APRESENTAR
-Os 5 pontos mais importantes para defender, em lista numerada.
-
-## ❓ PERGUNTAS PROVÁVEIS DO JÚRI
-10 perguntas que o júri pode fazer, cada uma com uma resposta sugerida (formato: **Pergunta:** ... / **Resposta sugerida:** ...).
-
-## 💡 DICAS PARA A DEFESA
-Como se comportar, o que enfatizar, o que evitar. Lista clara de boas práticas.
-
-Responde sempre em Português de Moçambique. Adapta a profundidade ao nível do aluno.`;
+Responde em Português de Moçambique. Usa Markdown bem formatado com títulos (##), listas e **negrito** para destacar.`;
 
     const userParts = await buildUserPartsLabelled(
-      `Este é o material do trabalho do aluno:
-[material em anexo abaixo]
+      `Este é o material do trabalho do aluno (em anexo abaixo).
 
-Tema: ${tema} — Tipo: ${tipo_defesa || "não especificado"}
+Tema: ${tema}
+Tipo de defesa: ${tipo_defesa || "não especificado"}
 
-Cria resumo executivo, pontos-chave, perguntas do júri e dicas para a defesa.`,
+Cria o resumo executivo, pontos-chave, perguntas do júri com respostas e dicas para a defesa.`,
       [
         { label: "Material do trabalho", url: material_url, required: true },
       ],
