@@ -11,6 +11,7 @@ import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InstrucoesIA } from "@/components/InstrucoesIA";
 
 const Resolver = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Resolver = () => {
   const { profile, isPremium, refresh } = useProfile();
   const [ficha, setFicha] = useState<File | null>(null);
   const [tpc, setTpc] = useState<File | null>(null);
+  const [instrucoes, setInstrucoes] = useState("");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -43,7 +45,7 @@ const Resolver = () => {
       }
 
       const { data, error } = await supabase.functions.invoke("resolver-tpc", {
-        body: { ficha_url: fichaUrl, exercicio_url: tpcUrl },
+        body: { ficha_url: fichaUrl, exercicio_url: tpcUrl, instrucoes },
       });
 
       if (error) throw error;
@@ -100,6 +102,11 @@ const Resolver = () => {
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
               <FileUpload label="Ficha do Professor" optional file={ficha} onChange={setFicha} />
               <FileUpload label="Exercícios do TPC" file={tpc} onChange={setTpc} />
+              <InstrucoesIA
+                value={instrucoes}
+                onChange={setInstrucoes}
+                placeholder="Ex: Resolve em tópicos, usa linguagem simples, mostra cada passo separado, não uses fórmulas complexas..."
+              />
               <Button onClick={handleSubmit} disabled={!tpc || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary disabled:text-muted-foreground">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A IA está a analisar...</> : <><Sparkles className="w-4 h-4 mr-2" /> Resolver com IA</>}
               </Button>
@@ -122,7 +129,7 @@ const Resolver = () => {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={copy} className="flex-1"><Copy className="w-4 h-4 mr-2" /> Copiar Resposta</Button>
-                <Button onClick={() => { setResposta(null); setFicha(null); setTpc(null); }} className="flex-1 bg-primary text-primary-foreground hover:bg-primary-glow">
+                <Button onClick={() => { setResposta(null); setFicha(null); setTpc(null); setInstrucoes(""); }} className="flex-1 bg-primary text-primary-foreground hover:bg-primary-glow">
                   Resolver outro
                 </Button>
               </div>

@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, Calculator, ArrowLeft } from "lucide-react";
+import { InstrucoesIA } from "@/components/InstrucoesIA";
 
 const ACCEPT = {
   "image/*": [".png", ".jpg", ".jpeg", ".webp"],
@@ -24,6 +25,7 @@ const Matematica = () => {
   const { isPremium } = useProfile();
   const [exemplo, setExemplo] = useState<File | null>(null);
   const [exercicio, setExercicio] = useState<File | null>(null);
+  const [instrucoes, setInstrucoes] = useState("");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
 
@@ -36,7 +38,7 @@ const Matematica = () => {
       const exUrl = await uploadFile(exercicio, user.id);
       const exemploUrl = exemplo ? await uploadFile(exemplo, user.id) : null;
       const { data, error } = await supabase.functions.invoke("resolver-matematica", {
-        body: { ficha_url: exemploUrl, exercicio_url: exUrl },
+        body: { ficha_url: exemploUrl, exercicio_url: exUrl, instrucoes },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -72,6 +74,11 @@ const Matematica = () => {
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
               <FileUpload label="Como o professor resolve" optional file={exemplo} onChange={setExemplo} accept={ACCEPT} />
               <FileUpload label="Exercício a resolver" file={exercicio} onChange={setExercicio} accept={ACCEPT} />
+              <InstrucoesIA
+                value={instrucoes}
+                onChange={setInstrucoes}
+                placeholder="Ex: Resolve como o professor faz no caderno, mostra os cálculos intermédios, usa frações em vez de decimais..."
+              />
               <Button onClick={handleSubmit} disabled={!exercicio || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A resolver...</> : <><Sparkles className="w-4 h-4 mr-2" /> Resolver Passo a Passo</>}
               </Button>
