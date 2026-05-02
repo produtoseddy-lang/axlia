@@ -1,0 +1,2 @@
+ALTER TABLE public.pagamentos ADD COLUMN IF NOT EXISTS comprovativo_hash TEXT;
+CREATE INDEX IF NOT EXISTS idx_pagamentos_hash ON public.pagamentos(comprovativo_hash) WHERE comprovativo_hash IS NOT NULL;
