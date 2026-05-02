@@ -67,6 +67,7 @@ export type Database = {
       }
       pagamentos: {
         Row: {
+          comprovativo_hash: string | null
           comprovativo_url: string | null
           criado_em: string
           id: string
@@ -76,6 +77,7 @@ export type Database = {
           verificado_por_ia: boolean
         }
         Insert: {
+          comprovativo_hash?: string | null
           comprovativo_url?: string | null
           criado_em?: string
           id?: string
@@ -85,6 +87,7 @@ export type Database = {
           verificado_por_ia?: boolean
         }
         Update: {
+          comprovativo_hash?: string | null
           comprovativo_url?: string | null
           criado_em?: string
           id?: string
