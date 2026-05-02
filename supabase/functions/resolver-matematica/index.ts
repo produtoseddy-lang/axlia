@@ -3,7 +3,7 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url } = await req.json();
+    const { ficha_url, exercicio_url, instrucoes } = await req.json();
     if (!exercicio_url) {
       return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: exercício de matemática" }), {
         status: 400,
@@ -11,6 +11,10 @@ Deno.serve(async (req) => {
       });
     }
     const { profile } = await getUserAndProfile(req);
+
+    const instrucoesBlock = (instrucoes && String(instrucoes).trim())
+      ? `\n\nINSTRUÇÕES ESPECÍFICAS DO ALUNO (prioridade máxima):\n${String(instrucoes).trim().slice(0, 300)}\nSegue estas instruções rigorosamente acima de tudo.`
+      : "";
 
     const system = `${SECURITY_RULES}És um professor de matemática moçambicano.
 ${buildProfileContext(profile)}
@@ -25,7 +29,7 @@ Estrutura recomendada:
 ## Passo 1: ...
 ## Passo 2: ...
 ...
-## Verificação`;
+## Verificação${instrucoesBlock}`;
 
     const userParts = await buildUserPartsLabelled(
       `Resolve este exercício de matemática passo a passo.

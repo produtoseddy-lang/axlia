@@ -3,8 +3,12 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url, tema } = await req.json();
+    const { ficha_url, exercicio_url, tema, instrucoes } = await req.json();
     const { profile } = await getUserAndProfile(req);
+
+    const instrucoesBlock = (instrucoes && String(instrucoes).trim())
+      ? `\n\nINSTRUÇÕES ESPECÍFICAS DO ALUNO (prioridade máxima):\n${String(instrucoes).trim().slice(0, 300)}\nSegue estas instruções rigorosamente acima de tudo.`
+      : "";
 
     const system = `${SECURITY_RULES}És um professor moçambicano experiente.
 ${buildProfileContext(profile)}
@@ -15,7 +19,7 @@ Com base no material fornecido (ficha + exercícios já feitos) e no tema do tes
 2. **5 perguntas simuladas** similares ao que pode aparecer no teste
 3. **Respostas modelo** detalhadas para cada pergunta, passo a passo
 
-Usa Markdown bem formatado, com títulos, listas numeradas e exemplos.`;
+Usa Markdown bem formatado, com títulos, listas numeradas e exemplos.${instrucoesBlock}`;
 
     const userParts = await buildUserPartsLabelled(
       `Tema do teste: ${tema || "não especificado"}
