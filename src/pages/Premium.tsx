@@ -10,9 +10,8 @@ import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { Loader2, Crown, Smartphone, CheckCircle2, XCircle } from "lucide-react";
 
-// Placeholder M-Pesa / e-Mola number — atualizar quando o cliente fornecer
-const MPESA_NUM = "+258 84 000 0000";
-const EMOLA_NUM = "+258 86 000 0000";
+const MPESA_NUM = "85 194 9156";
+const EMOLA_NUM = "87 945 7808";
 
 const Premium = () => {
   const navigate = useNavigate();
