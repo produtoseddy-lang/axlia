@@ -3,6 +3,7 @@ import { Upload, FileText, X, Camera, FileUp } from "lucide-react";
 import { useCallback, useRef } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Props {
   label: string;
