@@ -21,6 +21,8 @@ import VerificarEmail from "./pages/VerificarEmail.tsx";
 import VerificarCodigo from "./pages/VerificarCodigo.tsx";
 import Perfil from "./pages/Perfil.tsx";
 import Historico from "./pages/Historico.tsx";
+import RecuperarPassword from "./pages/RecuperarPassword.tsx";
+import NovaPassword from "./pages/NovaPassword.tsx";
 
 const queryClient = new QueryClient();
 
