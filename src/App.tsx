@@ -38,6 +38,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/verificar-email" element={<VerificarEmail />} />
             <Route path="/verificar-codigo" element={<VerificarCodigo />} />
+            <Route path="/recuperar-password" element={<RecuperarPassword />} />
+            <Route path="/nova-password" element={<NovaPassword />} />
             <Route path="/quiz" element={<ProtectedRoute requireOnboarding={false}><Quiz /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/resolver" element={<ProtectedRoute><Resolver /></ProtectedRoute>} />
