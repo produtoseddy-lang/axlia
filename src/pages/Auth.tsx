@@ -15,9 +15,16 @@ import { evaluatePassword } from "@/lib/passwordStrength";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<"login" | "register">("login");
+
+  useEffect(() => {
+    const msg = (location.state as any)?.message;
+    if (msg) toast.success(msg);
+  }, [location.state]);
+
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
