@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InstrucoesIA } from "@/components/InstrucoesIA";
+import { ModoResposta, type Modo } from "@/components/ModoResposta";
 
 const Resolver = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const Resolver = () => {
   const [ficha, setFicha] = useState<File | null>(null);
   const [tpc, setTpc] = useState<File | null>(null);
   const [instrucoes, setInstrucoes] = useState("");
+  const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -45,7 +47,7 @@ const Resolver = () => {
       }
 
       const { data, error } = await supabase.functions.invoke("resolver-tpc", {
-        body: { ficha_url: fichaUrl, exercicio_url: tpcUrl, instrucoes },
+        body: { ficha_url: fichaUrl, exercicio_url: tpcUrl, instrucoes, modo },
       });
 
       if (error) throw error;
@@ -102,6 +104,7 @@ const Resolver = () => {
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
               <FileUpload label="Ficha do Professor" optional file={ficha} onChange={setFicha} />
               <FileUpload label="Exercícios do TPC" file={tpc} onChange={setTpc} />
+              <ModoResposta value={modo} onChange={setModo} />
               <InstrucoesIA
                 value={instrucoes}
                 onChange={setInstrucoes}
