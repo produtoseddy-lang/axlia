@@ -155,6 +155,11 @@ const Auth = () => {
                   <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Entrar"}
                   </Button>
+                  <div className="text-center">
+                    <Link to="/recuperar-password" className="text-sm text-primary hover:underline">
+                      Esqueceste a password? Clica aqui
+                    </Link>
+                  </div>
                 </form>
               </TabsContent>
 
