@@ -70,7 +70,6 @@ export const FileUpload = ({ label, optional, file, onChange, accept = DEFAULT_A
             ref={photoInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             className="hidden"
             onChange={handlePicked}
           />
@@ -82,15 +81,44 @@ export const FileUpload = ({ label, optional, file, onChange, accept = DEFAULT_A
             onChange={handlePicked}
           />
           <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => photoInputRef.current?.click()}
-              className="h-12 border-border hover:border-primary/50"
-            >
-              <Camera className="w-4 h-4 mr-2" />
-              Foto
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-12 border-border hover:border-primary/50"
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Foto
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-2" align="start">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = photoInputRef.current;
+                    if (!el) return;
+                    el.setAttribute("capture", "environment");
+                    el.click();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-md hover:bg-accent text-sm"
+                >
+                  📷 Tirar foto agora
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = photoInputRef.current;
+                    if (!el) return;
+                    el.removeAttribute("capture");
+                    el.click();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-md hover:bg-accent text-sm"
+                >
+                  🖼️ Escolher da galeria
+                </button>
+              </PopoverContent>
+            </Popover>
             <Button
               type="button"
               variant="outline"
