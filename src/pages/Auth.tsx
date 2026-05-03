@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,16 @@ import { evaluatePassword } from "@/lib/passwordStrength";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<"login" | "register">("login");
+
+  useEffect(() => {
+    const msg = (location.state as any)?.message;
+    if (msg) toast.success(msg);
+  }, [location.state]);
+
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -148,6 +155,11 @@ const Auth = () => {
                   <Button type="submit" disabled={loading} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Entrar"}
                   </Button>
+                  <div className="text-center">
+                    <Link to="/recuperar-password" className="text-sm text-primary hover:underline">
+                      Esqueceste a password? Clica aqui
+                    </Link>
+                  </div>
                 </form>
               </TabsContent>
 

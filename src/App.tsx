@@ -21,6 +21,8 @@ import VerificarEmail from "./pages/VerificarEmail.tsx";
 import VerificarCodigo from "./pages/VerificarCodigo.tsx";
 import Perfil from "./pages/Perfil.tsx";
 import Historico from "./pages/Historico.tsx";
+import RecuperarPassword from "./pages/RecuperarPassword.tsx";
+import NovaPassword from "./pages/NovaPassword.tsx";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/verificar-email" element={<VerificarEmail />} />
             <Route path="/verificar-codigo" element={<VerificarCodigo />} />
+            <Route path="/recuperar-password" element={<RecuperarPassword />} />
+            <Route path="/nova-password" element={<NovaPassword />} />
             <Route path="/quiz" element={<ProtectedRoute requireOnboarding={false}><Quiz /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/resolver" element={<ProtectedRoute><Resolver /></ProtectedRoute>} />
