@@ -3,12 +3,16 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url, tema, instrucoes } = await req.json();
+    const { ficha_url, exercicio_url, tema, instrucoes, modo } = await req.json();
     const { profile } = await getUserAndProfile(req);
 
     const instrucoesBlock = (instrucoes && String(instrucoes).trim())
       ? `\n\nINSTRUÇÕES ESPECÍFICAS DO ALUNO (prioridade máxima):\n${String(instrucoes).trim().slice(0, 300)}\nSegue estas instruções rigorosamente acima de tudo.`
       : "";
+
+    const modoBlock = modo === "completa"
+      ? `\n\nMODO DE RESPOSTA: Explica cada passo detalhadamente com todo o raciocínio em cada resposta modelo.`
+      : `\n\nMODO DE RESPOSTA: Dá apenas as respostas finais de forma directa e concisa, sem explicações longas.`;
 
     const system = `${SECURITY_RULES}És um professor moçambicano experiente.
 ${buildProfileContext(profile)}
@@ -17,9 +21,9 @@ Com base no material fornecido (ficha + exercícios já feitos) e no tema do tes
 
 1. **Resumo dos tópicos mais importantes** sobre o tema
 2. **5 perguntas simuladas** similares ao que pode aparecer no teste
-3. **Respostas modelo** detalhadas para cada pergunta, passo a passo
+3. **Respostas modelo** para cada pergunta
 
-Usa Markdown bem formatado, com títulos, listas numeradas e exemplos.${instrucoesBlock}`;
+Usa Markdown bem formatado, com títulos, listas numeradas e exemplos.${modoBlock}${instrucoesBlock}`;
 
     const userParts = await buildUserPartsLabelled(
       `Tema do teste: ${tema || "não especificado"}

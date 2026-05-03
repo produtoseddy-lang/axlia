@@ -11,6 +11,7 @@ import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, Calculator, ArrowLeft } from "lucide-react";
 import { InstrucoesIA } from "@/components/InstrucoesIA";
+import { ModoResposta, type Modo } from "@/components/ModoResposta";
 
 const ACCEPT = {
   "image/*": [".png", ".jpg", ".jpeg", ".webp"],
@@ -26,6 +27,7 @@ const Matematica = () => {
   const [exemplo, setExemplo] = useState<File | null>(null);
   const [exercicio, setExercicio] = useState<File | null>(null);
   const [instrucoes, setInstrucoes] = useState("");
+  const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
 
@@ -38,7 +40,7 @@ const Matematica = () => {
       const exUrl = await uploadFile(exercicio, user.id);
       const exemploUrl = exemplo ? await uploadFile(exemplo, user.id) : null;
       const { data, error } = await supabase.functions.invoke("resolver-matematica", {
-        body: { ficha_url: exemploUrl, exercicio_url: exUrl, instrucoes },
+        body: { ficha_url: exemploUrl, exercicio_url: exUrl, instrucoes, modo },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -74,6 +76,7 @@ const Matematica = () => {
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
               <FileUpload label="Como o professor resolve" optional file={exemplo} onChange={setExemplo} accept={ACCEPT} />
               <FileUpload label="Exercício a resolver" file={exercicio} onChange={setExercicio} accept={ACCEPT} />
+              <ModoResposta value={modo} onChange={setModo} />
               <InstrucoesIA
                 value={instrucoes}
                 onChange={setInstrucoes}
