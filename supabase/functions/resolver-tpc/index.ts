@@ -3,7 +3,7 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url, instrucoes } = await req.json();
+    const { ficha_url, exercicio_url, instrucoes, modo } = await req.json();
     if (!exercicio_url) {
       return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: exercício do TPC" }), {
         status: 400,
@@ -16,13 +16,16 @@ Deno.serve(async (req) => {
       ? `\n\nINSTRUÇÕES ESPECÍFICAS DO ALUNO (prioridade máxima):\n${String(instrucoes).trim().slice(0, 300)}\nSegue estas instruções rigorosamente acima de tudo.`
       : "";
 
+    const modoBlock = modo === "completa"
+      ? `\n\nMODO DE RESPOSTA: Explica cada passo detalhadamente com todo o raciocínio.`
+      : `\n\nMODO DE RESPOSTA: Dá apenas a resposta final de forma directa e concisa.`;
+
     const system = `${SECURITY_RULES}És um assistente de estudos para alunos moçambicanos.
 ${buildProfileContext(profile)}
 
 Resolve os exercícios do TPC. Se houver ficha do professor, usa EXACTAMENTE o mesmo método e formato dela.
 Se não houver ficha, usa o método padrão moçambicano para o nível indicado.
-Mostra a resolução passo a passo, com explicações claras.
-Usa Markdown: títulos, listas e **negrito** para destacar.${instrucoesBlock}`;
+Usa Markdown: títulos, listas e **negrito** para destacar.${modoBlock}${instrucoesBlock}`;
 
     const userParts = await buildUserPartsLabelled(
       `Por favor resolve este TPC.

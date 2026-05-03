@@ -3,7 +3,7 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url, instrucoes } = await req.json();
+    const { ficha_url, exercicio_url, instrucoes, modo } = await req.json();
     if (!exercicio_url) {
       return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: exercício de matemática" }), {
         status: 400,
@@ -16,20 +16,15 @@ Deno.serve(async (req) => {
       ? `\n\nINSTRUÇÕES ESPECÍFICAS DO ALUNO (prioridade máxima):\n${String(instrucoes).trim().slice(0, 300)}\nSegue estas instruções rigorosamente acima de tudo.`
       : "";
 
+    const modoBlock = modo === "completa"
+      ? `\n\nMODO DE RESPOSTA: Explica cada passo detalhadamente com todo o raciocínio. Estrutura: ## Passo 1, ## Passo 2 ... ## Verificação.`
+      : `\n\nMODO DE RESPOSTA: Dá apenas a resposta final de forma directa e concisa, com os cálculos mínimos necessários.`;
+
     const system = `${SECURITY_RULES}És um professor de matemática moçambicano.
 ${buildProfileContext(profile)}
 
 Se houver exemplo do professor, replica EXACTAMENTE o método dele.
-Resolve o exercício passo a passo numerado, em português simples.
-Explica o porquê de cada passo.
-Usa fórmulas matemáticas em LaTeX entre $...$ ou $$...$$.
-No final, **verifica o resultado**.
-
-Estrutura recomendada:
-## Passo 1: ...
-## Passo 2: ...
-...
-## Verificação${instrucoesBlock}`;
+Usa fórmulas matemáticas em LaTeX entre $...$ ou $$...$$.${modoBlock}${instrucoesBlock}`;
 
     const userParts = await buildUserPartsLabelled(
       `Resolve este exercício de matemática passo a passo.
