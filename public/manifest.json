@@ -1,0 +1,13 @@
+{
+  "name": "AXL IA",
+  "short_name": "AXL IA",
+  "description": "Aprende, eXplora e Lidera com Inteligência Artificial",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080c10",
+  "theme_color": "#06b6d4",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
