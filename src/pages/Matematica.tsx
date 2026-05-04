@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, Calculator, ArrowLeft } from "lucide-react";
 import { InstrucoesIA } from "@/components/InstrucoesIA";
 import { ModoResposta, type Modo } from "@/components/ModoResposta";
+import { WhatsAppShare } from "@/components/WhatsAppShare";
+import { FeedbackResposta } from "@/components/FeedbackResposta";
 
 const ACCEPT = {
   "image/*": [".png", ".jpg", ".jpeg", ".webp"],
@@ -30,6 +32,7 @@ const Matematica = () => {
   const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
+  const [sessaoId, setSessaoId] = useState<string | null>(null);
 
   if (!isPremium) return <Navigate to="/premium" replace />;
 
@@ -45,9 +48,10 @@ const Matematica = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setResposta(data.resposta);
-      await supabase.from("sessoes").insert({
+      const { data: sess } = await supabase.from("sessoes").insert({
         user_id: user.id, tipo: "matematica", ficha_url: exemploUrl, exercicio_url: exUrl, resposta_ia: data.resposta,
-      });
+      }).select("id").maybeSingle();
+      setSessaoId(sess?.id ?? null);
     } catch (e: any) {
       toast.error(e.message ?? "Erro");
     } finally {
