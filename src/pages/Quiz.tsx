@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowRight, Loader2, Search } from "lucide-react";
 import axlLogo from "@/assets/axl-logo.png";
+import { OnboardingTour } from "@/components/OnboardingTour";
 
 type Answers = {
   objectivo_estudo?: string;
@@ -62,6 +63,7 @@ const Quiz = () => {
   const [answers, setAnswers] = useState<Answers>({});
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     if (profile?.onboarding_completo) navigate("/dashboard", { replace: true });
@@ -89,7 +91,11 @@ const Quiz = () => {
       toast.error("Erro ao guardar perfil");
       return;
     }
-    // Force full page reload to /dashboard to avoid blank screen after quiz
+    setSaving(false);
+    setShowTour(true);
+  };
+
+  const goDashboard = () => {
     window.location.href = "/dashboard";
   };
 
@@ -123,6 +129,7 @@ const Quiz = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {showTour && <OnboardingTour onFinish={goDashboard} />}
       <Header />
       <div className="flex-1 px-4 py-8">
         <div className="max-w-xl mx-auto">
