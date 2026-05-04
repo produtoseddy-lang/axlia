@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, Clock, GraduationCap, ChevronRight } from "lucide-react";
+import { ConvidarAmigos } from "@/components/ConvidarAmigos";
 
 interface Sessao {
   id: string;
@@ -73,20 +74,36 @@ const Dashboard = () => {
           )}
 
           {/* Créditos free */}
-          {!isPremium && profile && (
-            <div className="mb-6 p-4 bg-card border border-border rounded-xl card-glow">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium">{profile.creditos_hoje} de 3 créditos restantes hoje</span>
+          {!isPremium && profile && (() => {
+            const usadas = 3 - profile.creditos_hoje;
+            const restantes = profile.creditos_hoje;
+            const esgotado = restantes === 0;
+            const critico = restantes === 1;
+            return (
+              <div className="mb-6 p-4 bg-card border border-border rounded-xl card-glow">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className={`w-4 h-4 ${critico || esgotado ? "text-destructive" : "text-primary"}`} />
+                    <span className="text-sm font-medium">⚡ {usadas} de 3 perguntas usadas hoje</span>
+                  </div>
+                  <Button size="sm" variant="ghost" onClick={() => navigate("/premium")} className="text-primary">
+                    Upgrade
+                  </Button>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => navigate("/premium")} className="text-primary">
-                  Upgrade
-                </Button>
+                <Progress
+                  value={(usadas / 3) * 100}
+                  className={`h-2 ${critico || esgotado ? "[&>div]:bg-destructive" : ""}`}
+                />
+                {esgotado && (
+                  <p className="text-xs text-destructive mt-2 font-medium">
+                    Voltamos amanhã às 00:00 ou faz upgrade agora
+                  </p>
+                )}
               </div>
-              <Progress value={(profile.creditos_hoje / 3) * 100} className="h-2" />
-            </div>
-          )}
+            );
+          })()}
+
+          <ConvidarAmigos codigo={profile?.referral_code ?? null} />
 
           {/* Ferramentas */}
           <div className="grid md:grid-cols-2 gap-4 mb-10">

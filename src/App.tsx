@@ -23,6 +23,18 @@ import Perfil from "./pages/Perfil.tsx";
 import Historico from "./pages/Historico.tsx";
 import RecuperarPassword from "./pages/RecuperarPassword.tsx";
 import NovaPassword from "./pages/NovaPassword.tsx";
+import { PWAInstallBanner } from "./components/PWAInstallBanner";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+
+const RefCodeCapture = () => {
+  const [params] = useSearchParams();
+  useEffect(() => {
+    const ref = params.get("ref");
+    if (ref) localStorage.setItem("axl_pending_ref", ref);
+  }, [params]);
+  return null;
+};
 
 const queryClient = new QueryClient();
 
@@ -33,6 +45,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <RefCodeCapture />
+          <PWAInstallBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />

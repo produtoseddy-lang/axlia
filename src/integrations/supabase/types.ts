@@ -35,6 +35,33 @@ export type Database = {
         }
         Relationships: []
       }
+      feedbacks: {
+        Row: {
+          comentario: string | null
+          criado_em: string
+          id: string
+          sessao_id: string | null
+          user_id: string
+          util: boolean
+        }
+        Insert: {
+          comentario?: string | null
+          criado_em?: string
+          id?: string
+          sessao_id?: string | null
+          user_id: string
+          util: boolean
+        }
+        Update: {
+          comentario?: string | null
+          criado_em?: string
+          id?: string
+          sessao_id?: string | null
+          user_id?: string
+          util?: boolean
+        }
+        Relationships: []
+      }
       notificacoes: {
         Row: {
           criado_em: string
@@ -114,6 +141,7 @@ export type Database = {
           onboarding_completo: boolean
           plano: string
           premium_ate: string | null
+          referral_code: string | null
         }
         Insert: {
           creditos_hoje?: number
@@ -130,6 +158,7 @@ export type Database = {
           onboarding_completo?: boolean
           plano?: string
           premium_ate?: string | null
+          referral_code?: string | null
         }
         Update: {
           creditos_hoje?: number
@@ -146,6 +175,28 @@ export type Database = {
           onboarding_completo?: boolean
           plano?: string
           premium_ate?: string | null
+          referral_code?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          criado_em: string
+          id: string
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          referred_id?: string
+          referrer_id?: string
         }
         Relationships: []
       }
@@ -184,6 +235,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_referral: { Args: { _code: string }; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {

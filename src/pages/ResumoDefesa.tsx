@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadFile } from "@/lib/upload";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Copy, GraduationCap, ArrowLeft } from "lucide-react";
+import { WhatsAppShare } from "@/components/WhatsAppShare";
+import { FeedbackResposta } from "@/components/FeedbackResposta";
 
 const TIPOS_DEFESA = [
   "Trabalho de Curso",
@@ -31,6 +33,7 @@ const ResumoDefesa = () => {
   const [tipoDefesa, setTipoDefesa] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
+  const [sessaoId, setSessaoId] = useState<string | null>(null);
 
   if (!isPremium) return <Navigate to="/premium" replace />;
 
@@ -45,12 +48,13 @@ const ResumoDefesa = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setResposta(data.resposta);
-      await supabase.from("sessoes").insert({
+      const { data: sess } = await supabase.from("sessoes").insert({
         user_id: user.id,
         tipo: "defesa",
         ficha_url: materialUrl,
         resposta_ia: data.resposta,
-      });
+      }).select("id").maybeSingle();
+      setSessaoId(sess?.id ?? null);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao gerar resumo");
     } finally {
@@ -133,13 +137,15 @@ const ResumoDefesa = () => {
               <div className="bg-card border border-border rounded-2xl p-5 card-glow">
                 <MarkdownView content={resposta} />
               </div>
-              <div className="flex gap-2">
+              <FeedbackResposta sessaoId={sessaoId} />
+              <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={() => navigate("/dashboard")} className="flex-1">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
                 </Button>
                 <Button onClick={copy} className="flex-1 bg-primary text-primary-foreground hover:bg-primary-glow">
                   <Copy className="w-4 h-4 mr-2" /> Copiar Resposta
                 </Button>
+                <WhatsAppShare resposta={resposta} />
               </div>
             </div>
           )}

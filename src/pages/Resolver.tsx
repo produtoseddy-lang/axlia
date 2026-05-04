@@ -13,6 +13,8 @@ import { Loader2, Sparkles, Copy, Zap } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { InstrucoesIA } from "@/components/InstrucoesIA";
 import { ModoResposta, type Modo } from "@/components/ModoResposta";
+import { WhatsAppShare } from "@/components/WhatsAppShare";
+import { FeedbackResposta } from "@/components/FeedbackResposta";
 
 const Resolver = () => {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ const Resolver = () => {
   const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
   const [resposta, setResposta] = useState<string | null>(null);
+  const [sessaoId, setSessaoId] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleSubmit = async () => {
@@ -56,13 +59,14 @@ const Resolver = () => {
       const r = data.resposta as string;
       setResposta(r);
 
-      await supabase.from("sessoes").insert({
+      const { data: sess } = await supabase.from("sessoes").insert({
         user_id: user.id,
         tipo: "tpc",
         ficha_url: fichaUrl,
         exercicio_url: tpcUrl,
         resposta_ia: r,
-      });
+      }).select("id").maybeSingle();
+      setSessaoId(sess?.id ?? null);
       await refresh();
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao resolver TPC");
@@ -130,9 +134,11 @@ const Resolver = () => {
                 </div>
                 <MarkdownView content={resposta} />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={copy} className="flex-1"><Copy className="w-4 h-4 mr-2" /> Copiar Resposta</Button>
-                <Button onClick={() => { setResposta(null); setFicha(null); setTpc(null); setInstrucoes(""); }} className="flex-1 bg-primary text-primary-foreground hover:bg-primary-glow">
+              <FeedbackResposta sessaoId={sessaoId} />
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={copy} className="flex-1"><Copy className="w-4 h-4 mr-2" /> Copiar</Button>
+                <WhatsAppShare resposta={resposta} />
+                <Button onClick={() => { setResposta(null); setSessaoId(null); setFicha(null); setTpc(null); setInstrucoes(""); }} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
                   Resolver outro
                 </Button>
               </div>
