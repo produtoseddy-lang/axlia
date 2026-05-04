@@ -108,6 +108,15 @@ const Auth = () => {
         body: { fingerprint_id: fingerprint, user_id: data.user.id },
       });
 
+      // Apply pending referral code if any
+      const pendingRef = localStorage.getItem("axl_pending_ref");
+      if (pendingRef) {
+        try {
+          await supabase.rpc("apply_referral", { _code: pendingRef });
+        } catch {}
+        localStorage.removeItem("axl_pending_ref");
+      }
+
       sessionStorage.setItem("estudamz_pending_email", email);
       toast.success("Conta criada! Insere o código de 6 dígitos enviado por email 📧");
       navigate("/verificar-codigo");
