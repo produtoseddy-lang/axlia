@@ -95,13 +95,15 @@ const Matematica = () => {
               <div className="bg-card border border-border rounded-2xl p-5 card-glow">
                 <MarkdownView content={resposta} />
               </div>
-              <div className="flex gap-2">
+              <FeedbackResposta sessaoId={sessaoId} />
+              <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={() => navigate("/dashboard")} className="flex-1">
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
                 </Button>
                 <Button onClick={copy} className="flex-1 bg-primary text-primary-foreground hover:bg-primary-glow">
                   <Copy className="w-4 h-4 mr-2" /> Copiar
                 </Button>
+                <WhatsAppShare resposta={resposta} />
               </div>
             </div>
           )}
