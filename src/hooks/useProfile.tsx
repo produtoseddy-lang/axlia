@@ -17,6 +17,7 @@ export interface Profile {
   nivel_quiz: string | null;
   onboarding_completo: boolean;
   criado_em: string;
+  referral_code: string | null;
 }
 
 const ADMIN_EMAIL = "nhateazarias21@gmail.com";
