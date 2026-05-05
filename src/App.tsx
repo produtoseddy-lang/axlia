@@ -23,6 +23,7 @@ import Perfil from "./pages/Perfil.tsx";
 import Historico from "./pages/Historico.tsx";
 import RecuperarPassword from "./pages/RecuperarPassword.tsx";
 import NovaPassword from "./pages/NovaPassword.tsx";
+import Convidar from "./pages/Convidar.tsx";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
             <Route path="/historico" element={<ProtectedRoute><Historico /></ProtectedRoute>} />
+            <Route path="/convidar" element={<ProtectedRoute><Convidar /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

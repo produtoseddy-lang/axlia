@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Lock, Zap, BookOpen, Calculator, AlertTriangle, Sparkles, Clock, GraduationCap, ChevronRight } from "lucide-react";
-import { ConvidarAmigos } from "@/components/ConvidarAmigos";
+
 
 interface Sessao {
   id: string;
@@ -102,8 +102,6 @@ const Dashboard = () => {
               </div>
             );
           })()}
-
-          <ConvidarAmigos codigo={profile?.referral_code ?? null} />
 
           {/* Ferramentas */}
           <div className="grid md:grid-cols-2 gap-4 mb-10">

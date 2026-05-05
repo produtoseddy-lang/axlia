@@ -183,20 +183,26 @@ export type Database = {
         Row: {
           criado_em: string
           id: string
+          pagou_premium: boolean
           referred_id: string
           referrer_id: string
+          registou: boolean
         }
         Insert: {
           criado_em?: string
           id?: string
+          pagou_premium?: boolean
           referred_id: string
           referrer_id: string
+          registou?: boolean
         }
         Update: {
           criado_em?: string
           id?: string
+          pagou_premium?: boolean
           referred_id?: string
           referrer_id?: string
+          registou?: boolean
         }
         Relationships: []
       }
@@ -237,6 +243,7 @@ export type Database = {
     Functions: {
       apply_referral: { Args: { _code: string }; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      validate_referral_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

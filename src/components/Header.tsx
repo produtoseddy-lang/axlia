@@ -30,6 +30,7 @@ export const Header = () => {
               <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-primary transition">Dashboard</Link>
               <Link to="/resolver" className="text-sm text-muted-foreground hover:text-primary transition">Resolver TPC</Link>
               <Link to="/historico" className="text-sm text-muted-foreground hover:text-primary transition">Histórico</Link>
+              <Link to="/convidar" className="text-sm text-muted-foreground hover:text-primary transition">Convidar Amigos</Link>
               {!isPremium && (
                 <Link to="/premium" className="text-sm text-primary hover:text-primary-glow transition flex items-center gap-1">
                   <Crown className="w-4 h-4" /> Premium
@@ -101,6 +102,7 @@ export const Header = () => {
                 <Link to="/dashboard" onClick={() => setOpen(false)} className="text-sm py-1">Dashboard</Link>
                 <Link to="/resolver" onClick={() => setOpen(false)} className="text-sm py-1">Resolver TPC</Link>
                 <Link to="/historico" onClick={() => setOpen(false)} className="text-sm py-1">Histórico</Link>
+                <Link to="/convidar" onClick={() => setOpen(false)} className="text-sm py-1">Convidar Amigos</Link>
                 <Link to="/premium" onClick={() => setOpen(false)} className="text-sm py-1 text-primary">Premium</Link>
               </>
             ) : (
