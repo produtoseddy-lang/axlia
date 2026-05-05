@@ -29,6 +29,25 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
+  const [refCode, setRefCode] = useState("");
+  const [refStatus, setRefStatus] = useState<"idle" | "valid" | "invalid">("idle");
+
+  // Pre-fill from URL ?ref=
+  useEffect(() => {
+    const fromStorage = localStorage.getItem("axl_pending_ref");
+    if (fromStorage) setRefCode(fromStorage);
+  }, []);
+
+  // Live validate referral code
+  useEffect(() => {
+    const code = refCode.trim().toUpperCase();
+    if (!code) { setRefStatus("idle"); return; }
+    const t = setTimeout(async () => {
+      const { data } = await supabase.rpc("validate_referral_code", { _code: code });
+      setRefStatus(data ? "valid" : "invalid");
+    }, 400);
+    return () => clearTimeout(t);
+  }, [refCode]);
 
   useEffect(() => {
     if (user) navigate("/dashboard", { replace: true });
@@ -108,12 +127,16 @@ const Auth = () => {
         body: { fingerprint_id: fingerprint, user_id: data.user.id },
       });
 
-      // Apply pending referral code if any
-      const pendingRef = localStorage.getItem("axl_pending_ref");
-      if (pendingRef) {
+      // Apply referral code (from form or pending)
+      const codeToApply = (refCode.trim() || localStorage.getItem("axl_pending_ref") || "").toUpperCase();
+      if (codeToApply) {
         try {
-          await supabase.rpc("apply_referral", { _code: pendingRef });
-        } catch {}
+          const { data: r } = await supabase.rpc("apply_referral", { _code: codeToApply });
+          if ((r as any)?.ok) toast.success("✓ Código válido! Bem-vindo ao AXL IA");
+          else toast.message("Código inválido, continua sem código");
+        } catch {
+          toast.message("Código inválido, continua sem código");
+        }
         localStorage.removeItem("axl_pending_ref");
       }
 
