@@ -246,6 +246,25 @@ const Auth = () => {
                       </div>
                     </div>
                   </div>
+                  <div>
+                    <Label htmlFor="rcode">Código de convite (opcional)</Label>
+                    <Input
+                      id="rcode"
+                      value={refCode}
+                      onChange={(e) => setRefCode(e.target.value.toUpperCase())}
+                      placeholder="Ex: AXL-F20A94"
+                    />
+                    {refStatus === "valid" && (
+                      <p className="text-xs text-emerald-500 mt-1 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Código válido!
+                      </p>
+                    )}
+                    {refStatus === "invalid" && (
+                      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                        <X className="w-3 h-3" /> Código inválido
+                      </p>
+                    )}
+                  </div>
                   <Button
                     type="submit"
                     disabled={loading || !strength.isValid}
