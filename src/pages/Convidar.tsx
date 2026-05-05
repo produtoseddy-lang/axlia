@@ -75,10 +75,9 @@ const Convidar = () => {
   const msg = `Experimenta o AXL IA grátis! A IA que ensina no estilo do teu professor 🤖\nUsa o meu código ${codigo} ao registares e ganha acesso especial!\n👉 axlia.lovable.app`;
 
   const total = refs.length;
-  const ciclo = total % 3;
-  const completos = Math.floor(total / 3);
-  const diasGanhos = completos + refs.filter((r) => r.pagou_premium).length * 7;
-  const acabouCiclo = ciclo === 0 && total > 0;
+  const recompensaRegistoDada = (profile as any)?.recompensa_registo_dada ?? false;
+  const recompensaPremiumDada = (profile as any)?.recompensa_premium_dada ?? false;
+  const progressoRegisto = Math.min(total, 3);
 
   const copy = () => {
     navigator.clipboard.writeText(codigo);
@@ -101,12 +100,32 @@ const Convidar = () => {
           </div>
 
           {/* Como funciona */}
-          <div className="p-5 bg-card border border-border rounded-2xl card-glow">
-            <h3 className="font-semibold mb-2">🎯 Como funciona</h3>
-            <ul className="text-sm space-y-1 text-muted-foreground">
-              <li>✓ 3 amigos registados = <span className="text-foreground font-medium">1 dia Premium grátis</span></li>
-              <li>✓ Por cada amigo que pagar Premium = <span className="text-foreground font-medium">7 dias extra</span></li>
-            </ul>
+          <div className="p-5 bg-card border border-border rounded-2xl card-glow space-y-3">
+            <h3 className="font-semibold">🎯 Como funciona</h3>
+
+            <div className="flex items-start justify-between gap-3 p-3 rounded-xl bg-secondary/30">
+              <div className="text-sm">
+                <p className="font-medium">3 amigos registados → 1 dia grátis</p>
+                <p className="text-xs text-muted-foreground">Recompensa única</p>
+              </div>
+              {recompensaRegistoDada && (
+                <Badge className="bg-emerald-500/15 text-emerald-500 border-emerald-500/30 shrink-0">
+                  ✅ Recebida
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-start justify-between gap-3 p-3 rounded-xl bg-secondary/30">
+              <div className="text-sm">
+                <p className="font-medium">Amigo paga Premium → 7 dias grátis</p>
+                <p className="text-xs text-muted-foreground">Recompensa única</p>
+              </div>
+              {recompensaPremiumDada && (
+                <Badge className="bg-emerald-500/15 text-emerald-500 border-emerald-500/30 shrink-0">
+                  ✅ Recebida
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* Código */}
@@ -123,22 +142,20 @@ const Convidar = () => {
             </Button>
           </div>
 
-          {/* Progresso */}
-          <div className="p-5 bg-card border border-border rounded-2xl card-glow">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">{ciclo} de 3 amigos registados</span>
-              <span className="text-xs text-muted-foreground">{total} no total</span>
+          {/* Progresso registo (só se ainda não recebeu) */}
+          {!recompensaRegistoDada && (
+            <div className="p-5 bg-card border border-border rounded-2xl card-glow">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">{progressoRegisto} de 3 amigos registados</span>
+                <span className="text-xs text-muted-foreground">{total} no total</span>
+              </div>
+              <Progress value={(progressoRegisto / 3) * 100} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">
+                Faltam {Math.max(0, 3 - total)} para ganhares 1 dia Premium
+              </p>
             </div>
-            <Progress
-              value={(ciclo / 3) * 100}
-              className={`h-2 ${acabouCiclo ? "[&>div]:bg-emerald-500" : ""}`}
-            />
-            {acabouCiclo && (
-              <p className="text-sm text-emerald-500 mt-2 font-medium">🎉 Ganhaste 1 dia Premium!</p>
-            )}
-          </div>
+          )}
 
-          {/* Total ganho */}
           <div className="p-5 bg-card border border-primary/30 rounded-2xl card-glow flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center">
               <Crown className="w-6 h-6 text-primary" />
