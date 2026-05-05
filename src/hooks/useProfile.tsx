@@ -18,6 +18,8 @@ export interface Profile {
   onboarding_completo: boolean;
   criado_em: string;
   referral_code: string | null;
+  recompensa_registo_dada?: boolean;
+  recompensa_premium_dada?: boolean;
 }
 
 const ADMIN_EMAIL = "nhateazarias21@gmail.com";
