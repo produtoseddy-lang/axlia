@@ -161,8 +161,10 @@ const Convidar = () => {
               <Crown className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Total de dias ganhos</p>
-              <p className="text-2xl font-bold">{diasGanhos} {diasGanhos === 1 ? "dia" : "dias"}</p>
+              <p className="text-xs text-muted-foreground">Dias Premium ganhos por convites</p>
+              <p className="text-2xl font-bold">
+                {(recompensaRegistoDada ? 1 : 0) + (recompensaPremiumDada ? 7 : 0)} dias
+              </p>
             </div>
           </div>
 
