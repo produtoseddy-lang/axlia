@@ -18,6 +18,8 @@ export interface Profile {
   onboarding_completo: boolean;
   criado_em: string;
   referral_code: string | null;
+  recompensa_registo_dada?: boolean;
+  recompensa_premium_dada?: boolean;
 }
 
 const ADMIN_EMAIL = "nhateazarias21@gmail.com";
@@ -72,7 +74,7 @@ export const useProfile = () => {
 
       if (Object.keys(updates).length > 0) {
         await supabase.from("profiles").update(updates).eq("id", user.id);
-        data = { ...data, ...updates } as Profile;
+        data = { ...data, ...updates } as any;
       }
 
       setProfile(data as Profile);

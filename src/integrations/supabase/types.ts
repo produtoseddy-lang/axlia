@@ -141,6 +141,8 @@ export type Database = {
           onboarding_completo: boolean
           plano: string
           premium_ate: string | null
+          recompensa_premium_dada: boolean
+          recompensa_registo_dada: boolean
           referral_code: string | null
         }
         Insert: {
@@ -158,6 +160,8 @@ export type Database = {
           onboarding_completo?: boolean
           plano?: string
           premium_ate?: string | null
+          recompensa_premium_dada?: boolean
+          recompensa_registo_dada?: boolean
           referral_code?: string | null
         }
         Update: {
@@ -175,6 +179,8 @@ export type Database = {
           onboarding_completo?: boolean
           plano?: string
           premium_ate?: string | null
+          recompensa_premium_dada?: boolean
+          recompensa_registo_dada?: boolean
           referral_code?: string | null
         }
         Relationships: []
