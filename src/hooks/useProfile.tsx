@@ -74,7 +74,7 @@ export const useProfile = () => {
 
       if (Object.keys(updates).length > 0) {
         await supabase.from("profiles").update(updates).eq("id", user.id);
-        data = { ...data, ...updates } as Profile;
+        data = { ...data, ...updates } as any;
       }
 
       setProfile(data as Profile);
