@@ -97,6 +97,7 @@ export type Database = {
           comprovativo_hash: string | null
           comprovativo_url: string | null
           criado_em: string
+          email_pagamento: string | null
           id: string
           motivo: string | null
           status: string
@@ -107,6 +108,7 @@ export type Database = {
           comprovativo_hash?: string | null
           comprovativo_url?: string | null
           criado_em?: string
+          email_pagamento?: string | null
           id?: string
           motivo?: string | null
           status?: string
@@ -117,6 +119,7 @@ export type Database = {
           comprovativo_hash?: string | null
           comprovativo_url?: string | null
           criado_em?: string
+          email_pagamento?: string | null
           id?: string
           motivo?: string | null
           status?: string
