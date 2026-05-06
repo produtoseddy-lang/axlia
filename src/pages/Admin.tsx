@@ -125,11 +125,11 @@ const Admin = () => {
               <table className="w-full text-sm">
                 <thead className="bg-secondary text-xs uppercase text-muted-foreground">
                   <tr>
+                    <th className="text-left p-3">Email pagamento</th>
                     <th className="text-left p-3">User</th>
                     <th className="text-left p-3">Status</th>
                     <th className="text-left p-3">Data</th>
-                    <th className="text-left p-3">Comprovativo</th>
-                    <th className="text-left p-3">Acção</th>
+                    <th className="text-left p-3">Acções</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -137,7 +137,8 @@ const Admin = () => {
                     const u = users.find((x) => x.id === p.user_id);
                     return (
                       <tr key={p.id} className="border-t border-border">
-                        <td className="p-3">{u?.email ?? p.user_id}</td>
+                        <td className="p-3">{p.email_pagamento ?? "—"}</td>
+                        <td className="p-3 text-muted-foreground">{u?.email ?? p.user_id}</td>
                         <td className="p-3">
                           <Badge className={
                             p.status === "aprovado" ? "bg-success text-white" :
@@ -146,10 +147,12 @@ const Admin = () => {
                           }>{p.status}</Badge>
                         </td>
                         <td className="p-3 text-muted-foreground">{new Date(p.criado_em).toLocaleString("pt-PT")}</td>
-                        <td className="p-3">{p.comprovativo_url && <a href={p.comprovativo_url} target="_blank" rel="noreferrer" className="text-primary underline">Ver</a>}</td>
                         <td className="p-3">
-                          {p.status !== "aprovado" && (
-                            <Button size="sm" onClick={() => aprovar(p.id, p.user_id)} className="bg-primary text-primary-foreground hover:bg-primary-glow">Aprovar</Button>
+                          {p.status === "pendente" && (
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={() => aprovar(p.id, p.user_id)} className="bg-success text-white hover:bg-success/90">✅ Aprovar</Button>
+                              <Button size="sm" variant="destructive" onClick={() => rejeitar(p.id, p.user_id)}>❌ Rejeitar</Button>
+                            </div>
                           )}
                         </td>
                       </tr>
