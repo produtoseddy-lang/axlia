@@ -45,7 +45,25 @@ const Admin = () => {
     const novoAte = new Date(); novoAte.setDate(novoAte.getDate() + 30);
     await supabase.from("pagamentos").update({ status: "aprovado" }).eq("id", id);
     await supabase.from("profiles").update({ plano: "premium", premium_ate: novoAte.toISOString().slice(0, 10) }).eq("id", user_id);
+    await supabase.from("notificacoes").insert({
+      user_id,
+      titulo: "🎉 Premium activado!",
+      mensagem: "Bom estudo! Aproveita todos os recursos sem limites.",
+      tipo: "recompensa",
+    });
     toast.success("Pagamento aprovado");
+    load();
+  };
+
+  const rejeitar = async (id: string, user_id: string) => {
+    await supabase.from("pagamentos").update({ status: "rejeitado" }).eq("id", id);
+    await supabase.from("notificacoes").insert({
+      user_id,
+      titulo: "❌ Pagamento não confirmado",
+      mensagem: "Não conseguimos confirmar o teu pagamento. Contacta o suporte no WhatsApp para resolvermos.",
+      tipo: "sistema",
+    });
+    toast.success("Pagamento rejeitado");
     load();
   };
 
