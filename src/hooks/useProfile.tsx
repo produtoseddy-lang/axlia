@@ -49,17 +49,27 @@ export const useProfile = () => {
       data = r.data;
     }
 
+    // Check admin role from user_roles table
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    const admin = !!roleRow;
+    setIsAdmin(admin);
+
     if (data) {
       let updates: Partial<Profile> = {};
       const today = new Date().toISOString().slice(0, 10);
 
       // Admin always premium
-      if (user.email === ADMIN_EMAIL && data.plano !== "premium") {
+      if (admin && data.plano !== "premium") {
         updates.plano = "premium";
       }
 
       // Premium expirado → free
-      if (data.plano === "premium" && data.premium_ate && user.email !== ADMIN_EMAIL) {
+      if (data.plano === "premium" && data.premium_ate && !admin) {
         if (new Date(data.premium_ate) < new Date(today)) {
           updates.plano = "free";
           updates.premium_ate = null;
@@ -86,8 +96,8 @@ export const useProfile = () => {
     fetchProfile();
   }, [fetchProfile]);
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
   const isPremium = profile?.plano === "premium" || isAdmin;
 
   return { profile, loading, refresh: fetchProfile, isAdmin, isPremium };
 };
+
