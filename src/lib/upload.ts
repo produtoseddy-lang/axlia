@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
+// Uploads bucket is private. We return a long-lived signed URL so edge
+// functions (which fetch the file immediately) can read it.
 export const uploadFile = async (file: File, userId: string): Promise<string> => {
   const ext = file.name.split(".").pop();
   const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -8,8 +10,11 @@ export const uploadFile = async (file: File, userId: string): Promise<string> =>
     upsert: false,
   });
   if (error) throw error;
-  const { data } = supabase.storage.from("uploads").getPublicUrl(path);
-  return data.publicUrl;
+  const { data, error: signErr } = await supabase.storage
+    .from("uploads")
+    .createSignedUrl(path, 60 * 60); // 1 hour
+  if (signErr || !data) throw signErr ?? new Error("Falha ao gerar URL do ficheiro");
+  return data.signedUrl;
 };
 
 export const fileToBase64 = (file: File): Promise<string> =>
