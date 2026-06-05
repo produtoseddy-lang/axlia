@@ -27,6 +27,7 @@ import Convidar from "./pages/Convidar.tsx";
 import { PWAInstallBanner } from "./components/PWAInstallBanner";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useIdleLogout } from "@/hooks/useIdleLogout";
 
 const RefCodeCapture = () => {
   const [params] = useSearchParams();
@@ -34,6 +35,11 @@ const RefCodeCapture = () => {
     const ref = params.get("ref");
     if (ref) localStorage.setItem("axl_pending_ref", ref);
   }, [params]);
+  return null;
+};
+
+const IdleGuard = () => {
+  useIdleLogout();
   return null;
 };
 
