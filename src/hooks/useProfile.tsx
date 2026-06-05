@@ -50,7 +50,7 @@ export const useProfile = () => {
     }
 
     // Check admin role from user_roles table
-    const { data: roleRow } = await supabase
+    const { data: roleRow } = await (supabase as any)
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
