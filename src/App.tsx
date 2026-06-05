@@ -53,6 +53,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <RefCodeCapture />
+          <IdleGuard />
           <PWAInstallBanner />
           <Routes>
             <Route path="/" element={<Index />} />
