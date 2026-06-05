@@ -22,16 +22,16 @@ export interface Profile {
   recompensa_premium_dada?: boolean;
 }
 
-const ADMIN_EMAIL = "nhateazarias21@gmail.com";
-
 export const useProfile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
       setProfile(null);
+      setIsAdmin(false);
       setLoading(false);
       return;
     }
