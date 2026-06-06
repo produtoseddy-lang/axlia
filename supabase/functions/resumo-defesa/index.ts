@@ -3,8 +3,10 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { material_url, tema, tipo_defesa } = await req.json();
-    if (!material_url) {
+    const body = await req.json();
+    const { material_url, tema, tipo_defesa } = body;
+    const material_urls: string[] = body.material_urls ?? (material_url ? [material_url] : []);
+    if (material_urls.length === 0) {
       return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: material do trabalho" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
