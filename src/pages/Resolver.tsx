@@ -20,8 +20,8 @@ const Resolver = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, isPremium, refresh } = useProfile();
-  const [ficha, setFicha] = useState<File | null>(null);
-  const [tpc, setTpc] = useState<File | null>(null);
+  const [ficha, setFicha] = useState<File[]>([]);
+  const [tpc, setTpc] = useState<File[]>([]);
   const [instrucoes, setInstrucoes] = useState("");
   const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
