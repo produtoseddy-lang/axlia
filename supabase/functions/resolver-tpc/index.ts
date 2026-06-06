@@ -39,8 +39,8 @@ Esta é a ficha do professor — usa este método para resolver:
 Estes são os exercícios do TPC — resolve usando o método acima:
 [exercício em anexo abaixo]`,
       [
-        { label: "Ficha do professor", url: ficha_url, required: false },
-        { label: "Exercícios do TPC", url: exercicio_url, required: true },
+        { label: "Ficha do professor", urls: ficha_urls, required: false },
+        { label: "Exercícios do TPC", urls: exercicio_urls, required: true },
       ],
     );
 
