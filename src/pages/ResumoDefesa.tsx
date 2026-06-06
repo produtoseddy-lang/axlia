@@ -123,7 +123,7 @@ const ResumoDefesa = () => {
               </div>
               <Button
                 onClick={handleSubmit}
-                disabled={!material || !tema.trim() || loading}
+                disabled={material.length === 0 || !tema.trim() || loading}
                 className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary"
               >
                 {loading ? (
