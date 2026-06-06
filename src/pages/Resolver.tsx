@@ -140,7 +140,7 @@ const Resolver = () => {
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={copy} className="flex-1"><Copy className="w-4 h-4 mr-2" /> Copiar</Button>
                 <WhatsAppShare resposta={resposta} />
-                <Button onClick={() => { setResposta(null); setSessaoId(null); setFicha(null); setTpc(null); setInstrucoes(""); }} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
+                <Button onClick={() => { setResposta(null); setSessaoId(null); setFicha([]); setTpc([]); setInstrucoes(""); }} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
                   Resolver outro
                 </Button>
               </div>
