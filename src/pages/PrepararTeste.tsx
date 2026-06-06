@@ -22,8 +22,8 @@ const PrepararTeste = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium } = useProfile();
-  const [ficha, setFicha] = useState<File | null>(null);
-  const [exercicios, setExercicios] = useState<File | null>(null);
+  const [ficha, setFicha] = useState<File[]>([]);
+  const [exercicios, setExercicios] = useState<File[]>([]);
   const [tema, setTema] = useState("");
   const [instrucoes, setInstrucoes] = useState("");
   const [modo, setModo] = useState<Modo>("directa");
@@ -34,19 +34,21 @@ const PrepararTeste = () => {
   if (!isPremium) return <Navigate to="/premium" replace />;
 
   const handleSubmit = async () => {
-    if (!user || !exercicios) return;
+    if (!user || exercicios.length === 0) return;
     setLoading(true);
     try {
-      const exUrl = await uploadFile(exercicios, user.id);
-      const fichaUrl = ficha ? await uploadFile(ficha, user.id) : null;
+      const exUrls = await Promise.all(exercicios.map((f) => uploadFile(f, user.id)));
+      const fichaUrls = ficha.length
+        ? await Promise.all(ficha.map((f) => uploadFile(f, user.id)))
+        : [];
       const { data, error } = await supabase.functions.invoke("preparar-teste", {
-        body: { ficha_url: fichaUrl, exercicio_url: exUrl, tema, instrucoes, modo },
+        body: { ficha_urls: fichaUrls, exercicio_urls: exUrls, tema, instrucoes, modo },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setResposta(data.resposta);
       const { data: sess } = await supabase.from("sessoes").insert({
-        user_id: user.id, tipo: "teste", ficha_url: fichaUrl, exercicio_url: exUrl, resposta_ia: data.resposta,
+        user_id: user.id, tipo: "teste", ficha_url: fichaUrls[0] ?? null, exercicio_url: exUrls[0] ?? null, resposta_ia: data.resposta,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
     } catch (e: any) {
