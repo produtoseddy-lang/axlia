@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
+import { MultiFileUpload } from "@/components/MultiFileUpload";
 import { MarkdownView } from "@/components/MarkdownView";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -20,8 +20,8 @@ const Resolver = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, isPremium, refresh } = useProfile();
-  const [ficha, setFicha] = useState<File | null>(null);
-  const [tpc, setTpc] = useState<File | null>(null);
+  const [ficha, setFicha] = useState<File[]>([]);
+  const [tpc, setTpc] = useState<File[]>([]);
   const [instrucoes, setInstrucoes] = useState("");
   const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ const Resolver = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleSubmit = async () => {
-    if (!user || !tpc) return;
+    if (!user || tpc.length === 0) return;
 
     if (!isPremium && (profile?.creditos_hoje ?? 0) <= 0) {
       setShowUpgrade(true);
@@ -39,8 +39,10 @@ const Resolver = () => {
 
     setLoading(true);
     try {
-      const tpcUrl = await uploadFile(tpc, user.id);
-      const fichaUrl = ficha ? await uploadFile(ficha, user.id) : null;
+      const tpcUrls = await Promise.all(tpc.map((f) => uploadFile(f, user.id)));
+      const fichaUrls = ficha.length
+        ? await Promise.all(ficha.map((f) => uploadFile(f, user.id)))
+        : [];
 
       // Decrementar crédito antes de chamar a IA (se free)
       if (!isPremium) {
@@ -50,7 +52,7 @@ const Resolver = () => {
       }
 
       const { data, error } = await supabase.functions.invoke("resolver-tpc", {
-        body: { ficha_url: fichaUrl, exercicio_url: tpcUrl, instrucoes, modo },
+        body: { ficha_urls: fichaUrls, exercicio_urls: tpcUrls, instrucoes, modo },
       });
 
       if (error) throw error;
@@ -62,8 +64,8 @@ const Resolver = () => {
       const { data: sess } = await supabase.from("sessoes").insert({
         user_id: user.id,
         tipo: "tpc",
-        ficha_url: fichaUrl,
-        exercicio_url: tpcUrl,
+        ficha_url: fichaUrls[0] ?? null,
+        exercicio_url: tpcUrls[0] ?? null,
         resposta_ia: r,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
@@ -106,15 +108,15 @@ const Resolver = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload label="Ficha do Professor" optional file={ficha} onChange={setFicha} />
-              <FileUpload label="Exercícios do TPC" file={tpc} onChange={setTpc} />
+              <MultiFileUpload label="Ficha do Professor" optional files={ficha} onChange={setFicha} isPremium={isPremium} />
+              <MultiFileUpload label="Exercícios do TPC" files={tpc} onChange={setTpc} isPremium={isPremium} />
               <ModoResposta value={modo} onChange={setModo} />
               <InstrucoesIA
                 value={instrucoes}
                 onChange={setInstrucoes}
                 placeholder="Ex: Resolve em tópicos, usa linguagem simples, mostra cada passo separado, não uses fórmulas complexas..."
               />
-              <Button onClick={handleSubmit} disabled={!tpc || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary disabled:text-muted-foreground">
+              <Button onClick={handleSubmit} disabled={tpc.length === 0 || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary disabled:text-muted-foreground">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A IA está a analisar...</> : <><Sparkles className="w-4 h-4 mr-2" /> Resolver com IA</>}
               </Button>
               {!isPremium && profile && (
@@ -138,7 +140,7 @@ const Resolver = () => {
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={copy} className="flex-1"><Copy className="w-4 h-4 mr-2" /> Copiar</Button>
                 <WhatsAppShare resposta={resposta} />
-                <Button onClick={() => { setResposta(null); setSessaoId(null); setFicha(null); setTpc(null); setInstrucoes(""); }} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
+                <Button onClick={() => { setResposta(null); setSessaoId(null); setFicha([]); setTpc([]); setInstrucoes(""); }} className="w-full bg-primary text-primary-foreground hover:bg-primary-glow">
                   Resolver outro
                 </Button>
               </div>

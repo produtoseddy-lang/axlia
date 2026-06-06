@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileUpload } from "@/components/FileUpload";
+import { MultiFileUpload } from "@/components/MultiFileUpload";
 import { MarkdownView } from "@/components/MarkdownView";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -28,7 +28,7 @@ const ResumoDefesa = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium } = useProfile();
-  const [material, setMaterial] = useState<File | null>(null);
+  const [material, setMaterial] = useState<File[]>([]);
   const [tema, setTema] = useState("");
   const [tipoDefesa, setTipoDefesa] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -38,12 +38,12 @@ const ResumoDefesa = () => {
   if (!isPremium) return <Navigate to="/premium" replace />;
 
   const handleSubmit = async () => {
-    if (!user || !material || !tema.trim()) return;
+    if (!user || material.length === 0 || !tema.trim()) return;
     setLoading(true);
     try {
-      const materialUrl = await uploadFile(material, user.id);
+      const materialUrls = await Promise.all(material.map((f) => uploadFile(f, user.id)));
       const { data, error } = await supabase.functions.invoke("resumo-defesa", {
-        body: { material_url: materialUrl, tema: tema.trim(), tipo_defesa: tipoDefesa },
+        body: { material_urls: materialUrls, tema: tema.trim(), tipo_defesa: tipoDefesa },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -51,7 +51,7 @@ const ResumoDefesa = () => {
       const { data: sess } = await supabase.from("sessoes").insert({
         user_id: user.id,
         tipo: "defesa",
-        ficha_url: materialUrl,
+        ficha_url: materialUrls[0] ?? null,
         resposta_ia: data.resposta,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
@@ -86,10 +86,11 @@ const ResumoDefesa = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload
+              <MultiFileUpload
                 label="Material do trabalho"
-                file={material}
+                files={material}
                 onChange={setMaterial}
+                isPremium={isPremium}
                 accept={{
                   "image/*": [".png", ".jpg", ".jpeg", ".webp"],
                   "application/pdf": [".pdf"],
@@ -122,7 +123,7 @@ const ResumoDefesa = () => {
               </div>
               <Button
                 onClick={handleSubmit}
-                disabled={!material || !tema.trim() || loading}
+                disabled={material.length === 0 || !tema.trim() || loading}
                 className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary"
               >
                 {loading ? (

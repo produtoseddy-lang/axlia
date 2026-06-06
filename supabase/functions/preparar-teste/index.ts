@@ -3,7 +3,10 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url, tema, instrucoes, modo } = await req.json();
+    const body = await req.json();
+    const { ficha_url, exercicio_url, tema, instrucoes, modo } = body;
+    const ficha_urls: string[] = body.ficha_urls ?? (ficha_url ? [ficha_url] : []);
+    const exercicio_urls: string[] = body.exercicio_urls ?? (exercicio_url ? [exercicio_url] : []);
     const { profile } = await getUserAndProfile(req);
 
     const instrucoesBlock = (instrucoes && String(instrucoes).trim())
@@ -36,8 +39,8 @@ Estes são os exercícios já feitos pelo aluno:
 
 Com base neste material cria: resumo, perguntas simuladas e respostas passo a passo.`,
       [
-        { label: "Ficha do professor", url: ficha_url, required: false },
-        { label: "Exercícios já feitos pelo aluno", url: exercicio_url, required: false },
+        { label: "Ficha do professor", urls: ficha_urls, required: false },
+        { label: "Exercícios já feitos pelo aluno", urls: exercicio_urls, required: false },
       ],
     );
 

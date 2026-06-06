@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileUpload } from "@/components/FileUpload";
+import { MultiFileUpload } from "@/components/MultiFileUpload";
 import { MarkdownView } from "@/components/MarkdownView";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -22,8 +22,8 @@ const PrepararTeste = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium } = useProfile();
-  const [ficha, setFicha] = useState<File | null>(null);
-  const [exercicios, setExercicios] = useState<File | null>(null);
+  const [ficha, setFicha] = useState<File[]>([]);
+  const [exercicios, setExercicios] = useState<File[]>([]);
   const [tema, setTema] = useState("");
   const [instrucoes, setInstrucoes] = useState("");
   const [modo, setModo] = useState<Modo>("directa");
@@ -34,19 +34,21 @@ const PrepararTeste = () => {
   if (!isPremium) return <Navigate to="/premium" replace />;
 
   const handleSubmit = async () => {
-    if (!user || !exercicios) return;
+    if (!user || exercicios.length === 0) return;
     setLoading(true);
     try {
-      const exUrl = await uploadFile(exercicios, user.id);
-      const fichaUrl = ficha ? await uploadFile(ficha, user.id) : null;
+      const exUrls = await Promise.all(exercicios.map((f) => uploadFile(f, user.id)));
+      const fichaUrls = ficha.length
+        ? await Promise.all(ficha.map((f) => uploadFile(f, user.id)))
+        : [];
       const { data, error } = await supabase.functions.invoke("preparar-teste", {
-        body: { ficha_url: fichaUrl, exercicio_url: exUrl, tema, instrucoes, modo },
+        body: { ficha_urls: fichaUrls, exercicio_urls: exUrls, tema, instrucoes, modo },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setResposta(data.resposta);
       const { data: sess } = await supabase.from("sessoes").insert({
-        user_id: user.id, tipo: "teste", ficha_url: fichaUrl, exercicio_url: exUrl, resposta_ia: data.resposta,
+        user_id: user.id, tipo: "teste", ficha_url: fichaUrls[0] ?? null, exercicio_url: exUrls[0] ?? null, resposta_ia: data.resposta,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
     } catch (e: any) {
@@ -75,8 +77,8 @@ const PrepararTeste = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload label="Ficha do Professor" optional file={ficha} onChange={setFicha} />
-              <FileUpload label="Exercícios já feitos" file={exercicios} onChange={setExercicios} />
+              <MultiFileUpload label="Ficha do Professor" optional files={ficha} onChange={setFicha} isPremium={isPremium} />
+              <MultiFileUpload label="Exercícios já feitos" files={exercicios} onChange={setExercicios} isPremium={isPremium} />
               <div>
                 <Label htmlFor="tema">Tema do teste</Label>
                 <Input id="tema" value={tema} onChange={(e) => setTema(e.target.value)} placeholder="Ex: Equações de 2º grau" />
@@ -87,7 +89,7 @@ const PrepararTeste = () => {
                 onChange={setInstrucoes}
                 placeholder="Ex: Foca nos tópicos de termodinâmica, cria perguntas de desenvolvimento, não de escolha múltipla..."
               />
-              <Button onClick={handleSubmit} disabled={!exercicios || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
+              <Button onClick={handleSubmit} disabled={exercicios.length === 0 || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A preparar...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar Preparação</>}
               </Button>
             </div>

@@ -3,8 +3,11 @@ import { corsHeaders, getUserAndProfile, buildProfileContext, buildUserPartsLabe
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { ficha_url, exercicio_url, instrucoes, modo } = await req.json();
-    if (!exercicio_url) {
+    const body = await req.json();
+    const { ficha_url, exercicio_url, instrucoes, modo } = body;
+    const ficha_urls: string[] = body.ficha_urls ?? (ficha_url ? [ficha_url] : []);
+    const exercicio_urls: string[] = body.exercicio_urls ?? (exercicio_url ? [exercicio_url] : []);
+    if (exercicio_urls.length === 0) {
       return new Response(JSON.stringify({ error: "Ficheiro não recebido correctamente: exercício de matemática" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -37,8 +40,8 @@ Este é o exercício novo para resolver:
 
 Replica EXACTAMENTE o método do professor.`,
       [
-        { label: "Exemplo do professor", url: ficha_url, required: false },
-        { label: "Exercício a resolver", url: exercicio_url, required: true },
+        { label: "Exemplo do professor", urls: ficha_urls, required: false },
+        { label: "Exercício a resolver", urls: exercicio_urls, required: true },
       ],
     );
 

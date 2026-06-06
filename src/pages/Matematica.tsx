@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { FileUpload } from "@/components/FileUpload";
+import { MultiFileUpload } from "@/components/MultiFileUpload";
 import { MarkdownView } from "@/components/MarkdownView";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
@@ -26,8 +26,8 @@ const Matematica = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium } = useProfile();
-  const [exemplo, setExemplo] = useState<File | null>(null);
-  const [exercicio, setExercicio] = useState<File | null>(null);
+  const [exemplo, setExemplo] = useState<File[]>([]);
+  const [exercicio, setExercicio] = useState<File[]>([]);
   const [instrucoes, setInstrucoes] = useState("");
   const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
@@ -37,19 +37,21 @@ const Matematica = () => {
   if (!isPremium) return <Navigate to="/premium" replace />;
 
   const handleSubmit = async () => {
-    if (!user || !exercicio) return;
+    if (!user || exercicio.length === 0) return;
     setLoading(true);
     try {
-      const exUrl = await uploadFile(exercicio, user.id);
-      const exemploUrl = exemplo ? await uploadFile(exemplo, user.id) : null;
+      const exUrls = await Promise.all(exercicio.map((f) => uploadFile(f, user.id)));
+      const exemploUrls = exemplo.length
+        ? await Promise.all(exemplo.map((f) => uploadFile(f, user.id)))
+        : [];
       const { data, error } = await supabase.functions.invoke("resolver-matematica", {
-        body: { ficha_url: exemploUrl, exercicio_url: exUrl, instrucoes, modo },
+        body: { ficha_urls: exemploUrls, exercicio_urls: exUrls, instrucoes, modo },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setResposta(data.resposta);
       const { data: sess } = await supabase.from("sessoes").insert({
-        user_id: user.id, tipo: "matematica", ficha_url: exemploUrl, exercicio_url: exUrl, resposta_ia: data.resposta,
+        user_id: user.id, tipo: "matematica", ficha_url: exemploUrls[0] ?? null, exercicio_url: exUrls[0] ?? null, resposta_ia: data.resposta,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
     } catch (e: any) {
@@ -78,15 +80,15 @@ const Matematica = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload label="Como o professor resolve" optional file={exemplo} onChange={setExemplo} accept={ACCEPT} />
-              <FileUpload label="Exercício a resolver" file={exercicio} onChange={setExercicio} accept={ACCEPT} />
+              <MultiFileUpload label="Como o professor resolve" optional files={exemplo} onChange={setExemplo} isPremium={isPremium} accept={ACCEPT} />
+              <MultiFileUpload label="Exercício a resolver" files={exercicio} onChange={setExercicio} isPremium={isPremium} accept={ACCEPT} />
               <ModoResposta value={modo} onChange={setModo} />
               <InstrucoesIA
                 value={instrucoes}
                 onChange={setInstrucoes}
                 placeholder="Ex: Resolve como o professor faz no caderno, mostra os cálculos intermédios, usa frações em vez de decimais..."
               />
-              <Button onClick={handleSubmit} disabled={!exercicio || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
+              <Button onClick={handleSubmit} disabled={exercicio.length === 0 || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A resolver...</> : <><Sparkles className="w-4 h-4 mr-2" /> Resolver Passo a Passo</>}
               </Button>
             </div>
