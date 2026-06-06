@@ -80,15 +80,15 @@ const Matematica = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload label="Como o professor resolve" optional file={exemplo} onChange={setExemplo} accept={ACCEPT} />
-              <FileUpload label="Exercício a resolver" file={exercicio} onChange={setExercicio} accept={ACCEPT} />
+              <MultiFileUpload label="Como o professor resolve" optional files={exemplo} onChange={setExemplo} isPremium={isPremium} accept={ACCEPT} />
+              <MultiFileUpload label="Exercício a resolver" files={exercicio} onChange={setExercicio} isPremium={isPremium} accept={ACCEPT} />
               <ModoResposta value={modo} onChange={setModo} />
               <InstrucoesIA
                 value={instrucoes}
                 onChange={setInstrucoes}
                 placeholder="Ex: Resolve como o professor faz no caderno, mostra os cálculos intermédios, usa frações em vez de decimais..."
               />
-              <Button onClick={handleSubmit} disabled={!exercicio || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
+              <Button onClick={handleSubmit} disabled={exercicio.length === 0 || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A resolver...</> : <><Sparkles className="w-4 h-4 mr-2" /> Resolver Passo a Passo</>}
               </Button>
             </div>
