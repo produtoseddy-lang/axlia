@@ -39,8 +39,8 @@ Estes são os exercícios já feitos pelo aluno:
 
 Com base neste material cria: resumo, perguntas simuladas e respostas passo a passo.`,
       [
-        { label: "Ficha do professor", url: ficha_url, required: false },
-        { label: "Exercícios já feitos pelo aluno", url: exercicio_url, required: false },
+        { label: "Ficha do professor", urls: ficha_urls, required: false },
+        { label: "Exercícios já feitos pelo aluno", urls: exercicio_urls, required: false },
       ],
     );
 
