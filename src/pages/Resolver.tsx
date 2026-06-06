@@ -108,15 +108,15 @@ const Resolver = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload label="Ficha do Professor" optional file={ficha} onChange={setFicha} />
-              <FileUpload label="Exercícios do TPC" file={tpc} onChange={setTpc} />
+              <MultiFileUpload label="Ficha do Professor" optional files={ficha} onChange={setFicha} isPremium={isPremium} />
+              <MultiFileUpload label="Exercícios do TPC" files={tpc} onChange={setTpc} isPremium={isPremium} />
               <ModoResposta value={modo} onChange={setModo} />
               <InstrucoesIA
                 value={instrucoes}
                 onChange={setInstrucoes}
                 placeholder="Ex: Resolve em tópicos, usa linguagem simples, mostra cada passo separado, não uses fórmulas complexas..."
               />
-              <Button onClick={handleSubmit} disabled={!tpc || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary disabled:text-muted-foreground">
+              <Button onClick={handleSubmit} disabled={tpc.length === 0 || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary disabled:text-muted-foreground">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A IA está a analisar...</> : <><Sparkles className="w-4 h-4 mr-2" /> Resolver com IA</>}
               </Button>
               {!isPremium && profile && (
