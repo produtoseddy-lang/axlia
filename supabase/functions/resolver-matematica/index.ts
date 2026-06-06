@@ -40,8 +40,8 @@ Este é o exercício novo para resolver:
 
 Replica EXACTAMENTE o método do professor.`,
       [
-        { label: "Exemplo do professor", url: ficha_url, required: false },
-        { label: "Exercício a resolver", url: exercicio_url, required: true },
+        { label: "Exemplo do professor", urls: ficha_urls, required: false },
+        { label: "Exercício a resolver", urls: exercicio_urls, required: true },
       ],
     );
 
