@@ -44,7 +44,7 @@ Tipo de defesa: ${tipo_defesa || "não especificado"}
 
 Cria o resumo executivo, pontos-chave, perguntas do júri com respostas e dicas para a defesa.`,
       [
-        { label: "Material do trabalho", url: material_url, required: true },
+        { label: "Material do trabalho", urls: material_urls, required: true },
       ],
     );
 
