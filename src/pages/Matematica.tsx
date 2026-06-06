@@ -26,8 +26,8 @@ const Matematica = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isPremium } = useProfile();
-  const [exemplo, setExemplo] = useState<File | null>(null);
-  const [exercicio, setExercicio] = useState<File | null>(null);
+  const [exemplo, setExemplo] = useState<File[]>([]);
+  const [exercicio, setExercicio] = useState<File[]>([]);
   const [instrucoes, setInstrucoes] = useState("");
   const [modo, setModo] = useState<Modo>("directa");
   const [loading, setLoading] = useState(false);
@@ -37,19 +37,21 @@ const Matematica = () => {
   if (!isPremium) return <Navigate to="/premium" replace />;
 
   const handleSubmit = async () => {
-    if (!user || !exercicio) return;
+    if (!user || exercicio.length === 0) return;
     setLoading(true);
     try {
-      const exUrl = await uploadFile(exercicio, user.id);
-      const exemploUrl = exemplo ? await uploadFile(exemplo, user.id) : null;
+      const exUrls = await Promise.all(exercicio.map((f) => uploadFile(f, user.id)));
+      const exemploUrls = exemplo.length
+        ? await Promise.all(exemplo.map((f) => uploadFile(f, user.id)))
+        : [];
       const { data, error } = await supabase.functions.invoke("resolver-matematica", {
-        body: { ficha_url: exemploUrl, exercicio_url: exUrl, instrucoes, modo },
+        body: { ficha_urls: exemploUrls, exercicio_urls: exUrls, instrucoes, modo },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setResposta(data.resposta);
       const { data: sess } = await supabase.from("sessoes").insert({
-        user_id: user.id, tipo: "matematica", ficha_url: exemploUrl, exercicio_url: exUrl, resposta_ia: data.resposta,
+        user_id: user.id, tipo: "matematica", ficha_url: exemploUrls[0] ?? null, exercicio_url: exUrls[0] ?? null, resposta_ia: data.resposta,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
     } catch (e: any) {
