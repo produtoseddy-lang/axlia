@@ -77,8 +77,8 @@ const PrepararTeste = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload label="Ficha do Professor" optional file={ficha} onChange={setFicha} />
-              <FileUpload label="Exercícios já feitos" file={exercicios} onChange={setExercicios} />
+              <MultiFileUpload label="Ficha do Professor" optional files={ficha} onChange={setFicha} isPremium={isPremium} />
+              <MultiFileUpload label="Exercícios já feitos" files={exercicios} onChange={setExercicios} isPremium={isPremium} />
               <div>
                 <Label htmlFor="tema">Tema do teste</Label>
                 <Input id="tema" value={tema} onChange={(e) => setTema(e.target.value)} placeholder="Ex: Equações de 2º grau" />
@@ -89,7 +89,7 @@ const PrepararTeste = () => {
                 onChange={setInstrucoes}
                 placeholder="Ex: Foca nos tópicos de termodinâmica, cria perguntas de desenvolvimento, não de escolha múltipla..."
               />
-              <Button onClick={handleSubmit} disabled={!exercicios || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
+              <Button onClick={handleSubmit} disabled={exercicios.length === 0 || loading} className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary-glow disabled:bg-secondary">
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A preparar...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar Preparação</>}
               </Button>
             </div>
