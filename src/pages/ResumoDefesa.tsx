@@ -86,10 +86,11 @@ const ResumoDefesa = () => {
 
           {!resposta ? (
             <div className="bg-card border border-border rounded-2xl p-6 card-glow space-y-5">
-              <FileUpload
+              <MultiFileUpload
                 label="Material do trabalho"
-                file={material}
+                files={material}
                 onChange={setMaterial}
+                isPremium={isPremium}
                 accept={{
                   "image/*": [".png", ".jpg", ".jpeg", ".webp"],
                   "application/pdf": [".pdf"],
