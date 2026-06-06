@@ -30,7 +30,7 @@ const Resolver = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleSubmit = async () => {
-    if (!user || !tpc) return;
+    if (!user || tpc.length === 0) return;
 
     if (!isPremium && (profile?.creditos_hoje ?? 0) <= 0) {
       setShowUpgrade(true);
@@ -39,8 +39,10 @@ const Resolver = () => {
 
     setLoading(true);
     try {
-      const tpcUrl = await uploadFile(tpc, user.id);
-      const fichaUrl = ficha ? await uploadFile(ficha, user.id) : null;
+      const tpcUrls = await Promise.all(tpc.map((f) => uploadFile(f, user.id)));
+      const fichaUrls = ficha.length
+        ? await Promise.all(ficha.map((f) => uploadFile(f, user.id)))
+        : [];
 
       // Decrementar crédito antes de chamar a IA (se free)
       if (!isPremium) {
@@ -50,7 +52,7 @@ const Resolver = () => {
       }
 
       const { data, error } = await supabase.functions.invoke("resolver-tpc", {
-        body: { ficha_url: fichaUrl, exercicio_url: tpcUrl, instrucoes, modo },
+        body: { ficha_urls: fichaUrls, exercicio_urls: tpcUrls, instrucoes, modo },
       });
 
       if (error) throw error;
@@ -62,8 +64,8 @@ const Resolver = () => {
       const { data: sess } = await supabase.from("sessoes").insert({
         user_id: user.id,
         tipo: "tpc",
-        ficha_url: fichaUrl,
-        exercicio_url: tpcUrl,
+        ficha_url: fichaUrls[0] ?? null,
+        exercicio_url: tpcUrls[0] ?? null,
         resposta_ia: r,
       }).select("id").maybeSingle();
       setSessaoId(sess?.id ?? null);
