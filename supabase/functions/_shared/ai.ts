@@ -126,38 +126,40 @@ export const callLovableAI = async (userParts: any[], systemPrompt: string, mode
  */
 export const buildUserPartsLabelled = async (
   intro: string,
-  slots: { label: string; url?: string | null; required?: boolean }[],
+  slots: { label: string; url?: string | null; urls?: (string | null | undefined)[]; required?: boolean }[],
 ) => {
   const parts: any[] = [{ type: "text", text: intro }];
 
   for (const slot of slots) {
-    if (!slot.url) {
+    // Normalize to a list of urls
+    const urls = (slot.urls ?? [slot.url]).filter((u): u is string => !!u);
+
+    if (urls.length === 0) {
       if (slot.required) throw new Error(`Ficheiro não recebido correctamente: ${slot.label}`);
       continue;
     }
 
-    const file = await fetchUrlAsBase64(slot.url);
-    if (!file || !file.data) {
-      if (slot.required) throw new Error(`Ficheiro não recebido correctamente: ${slot.label}`);
-      continue;
+    let added = 0;
+    for (let i = 0; i < urls.length; i++) {
+      const file = await fetchUrlAsBase64(urls[i]);
+      if (!file || !file.data) {
+        console.warn(`[${slot.label}] falha a baixar ficheiro ${i + 1}`);
+        continue;
+      }
+
+      const sufixo = urls.length > 1 ? ` (${i + 1} de ${urls.length})` : "";
+      console.log(`[${slot.label}${sufixo}] mime=${file.mime} base64_size=${file.data.length}`);
+
+      parts.push({ type: "text", text: `\n--- ${slot.label}${sufixo} ---` });
+      parts.push({
+        type: "image_url",
+        image_url: { url: `data:${file.mime};base64,${file.data}` },
+      });
+      added++;
     }
 
-    console.log(`[${slot.label}] mime=${file.mime} base64_size=${file.data.length}`);
-
-    // Label the file in the conversation
-    parts.push({ type: "text", text: `\n--- ${slot.label} ---` });
-
-    if (file.mime.startsWith("image/")) {
-      parts.push({
-        type: "image_url",
-        image_url: { url: `data:${file.mime};base64,${file.data}` },
-      });
-    } else {
-      // PDFs and docs: send as image_url data URI too — gateway forwards to Gemini which accepts inline file data.
-      parts.push({
-        type: "image_url",
-        image_url: { url: `data:${file.mime};base64,${file.data}` },
-      });
+    if (added === 0 && slot.required) {
+      throw new Error(`Ficheiro não recebido correctamente: ${slot.label}`);
     }
   }
 
