@@ -17,7 +17,7 @@ const Index = () => {
             <span className="text-xs font-medium text-primary">Feito para alunos moçambicanos 🇲🇿</span>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up">
-            A IA que estuda no <br />
+            A IA que te ensina no <br />
             <span className="text-gradient">estilo do teu professor</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 animate-fade-up">
