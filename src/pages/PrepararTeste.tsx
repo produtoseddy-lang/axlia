@@ -16,7 +16,7 @@ import { InstrucoesIA } from "@/components/InstrucoesIA";
 import { ModoResposta, type Modo } from "@/components/ModoResposta";
 import { WhatsAppShare } from "@/components/WhatsAppShare";
 import { FeedbackResposta } from "@/components/FeedbackResposta";
-import { Navigate } from "react-router-dom";
+import { PremiumGate } from "@/components/PremiumGate";
 
 const PrepararTeste = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const PrepararTeste = () => {
   const [resposta, setResposta] = useState<string | null>(null);
   const [sessaoId, setSessaoId] = useState<string | null>(null);
 
-  if (!isPremium) return <Navigate to="/premium" replace />;
+  
 
   const handleSubmit = async () => {
     if (!user || exercicios.length === 0) return;
@@ -61,6 +61,7 @@ const PrepararTeste = () => {
   const copy = () => { if (resposta) { navigator.clipboard.writeText(resposta); toast.success("Copiado!"); } };
 
   return (
+    <PremiumGate>
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 px-4 py-8">
@@ -113,6 +114,7 @@ const PrepararTeste = () => {
         </div>
       </main>
     </div>
+    </PremiumGate>
   );
 };
 
