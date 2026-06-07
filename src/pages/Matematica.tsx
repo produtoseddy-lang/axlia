@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { PremiumGate } from "@/components/PremiumGate";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { MultiFileUpload } from "@/components/MultiFileUpload";
@@ -34,7 +35,7 @@ const Matematica = () => {
   const [resposta, setResposta] = useState<string | null>(null);
   const [sessaoId, setSessaoId] = useState<string | null>(null);
 
-  if (!isPremium) return <Navigate to="/premium" replace />;
+  
 
   const handleSubmit = async () => {
     if (!user || exercicio.length === 0) return;
@@ -64,6 +65,7 @@ const Matematica = () => {
   const copy = () => { if (resposta) { navigator.clipboard.writeText(resposta); toast.success("Copiado!"); } };
 
   return (
+    <PremiumGate>
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 px-4 py-8">
@@ -112,6 +114,7 @@ const Matematica = () => {
         </div>
       </main>
     </div>
+    </PremiumGate>
   );
 };
 
