@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MarkdownView } from "@/components/MarkdownView";
 import { ExplicarMelhorDialog } from "@/components/ExplicarMelhorDialog";
-import { ArrowLeft, HelpCircle, History as HistoryIcon } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
+import { HelpCircle, History as HistoryIcon } from "lucide-react";
 
 interface Sessao {
   id: string;
@@ -58,9 +59,7 @@ const Historico = () => {
       <Header />
       <main className="flex-1 px-4 py-8">
         <div className="container max-w-4xl">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
-          </Button>
+          <BackButton />
 
           <div className="flex items-center gap-2 mb-6">
             <HistoryIcon className="w-6 h-6 text-primary" />
