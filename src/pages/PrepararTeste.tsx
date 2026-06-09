@@ -67,6 +67,7 @@ const PrepararTeste = () => {
       <Header />
       <main className="flex-1 px-4 py-8">
         <div className="container max-w-3xl">
+          <BackButton />
           <div className="mb-6 flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-primary" />
