@@ -51,6 +51,7 @@ const Premium = () => {
       <Header />
       <main className="flex-1 px-4 py-8">
         <div className="container max-w-2xl space-y-6">
+          <BackButton />
           <div className="text-center">
             <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-glow items-center justify-center mb-4 glow-cyan">
               <Crown className="w-7 h-7 text-primary-foreground" />
