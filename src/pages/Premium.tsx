@@ -28,7 +28,10 @@ const Premium = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center px-4">
-          <div className="max-w-md text-center bg-card border border-primary/30 rounded-2xl p-8 card-glow">
+          <div className="max-w-md text-center bg-card border border-primary/30 rounded-2xl p-8 card-glow relative w-full">
+            <div className="absolute top-4 left-4">
+              <BackButton />
+            </div>
             <Crown className="w-12 h-12 text-primary mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">Já és Premium! 🎉</h1>
             <p className="text-muted-foreground mb-6">
