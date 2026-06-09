@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,10 @@ const Premium = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center px-4">
-          <div className="max-w-md text-center bg-card border border-primary/30 rounded-2xl p-8 card-glow">
+          <div className="max-w-md text-center bg-card border border-primary/30 rounded-2xl p-8 card-glow relative w-full">
+            <div className="absolute top-4 left-4">
+              <BackButton />
+            </div>
             <Crown className="w-12 h-12 text-primary mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">Já és Premium! 🎉</h1>
             <p className="text-muted-foreground mb-6">
@@ -50,6 +54,7 @@ const Premium = () => {
       <Header />
       <main className="flex-1 px-4 py-8">
         <div className="container max-w-2xl space-y-6">
+          <BackButton />
           <div className="text-center">
             <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-glow items-center justify-center mb-4 glow-cyan">
               <Crown className="w-7 h-7 text-primary-foreground" />

@@ -1,3 +1,4 @@
+import { BackButton } from "@/components/BackButton";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/hooks/useAuth";
@@ -92,6 +93,7 @@ const Convidar = () => {
       <Header />
       <main className="flex-1 px-4 py-8">
         <div className="container max-w-2xl space-y-6">
+          <BackButton />
           <div>
             <h1 className="text-3xl font-bold">🎁 Convida Amigos</h1>
             <p className="text-muted-foreground text-sm mt-1">
